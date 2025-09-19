@@ -4,21 +4,11 @@ This is a NodeJS/Express HTTP server that will allow you to quickly test the Sca
 
 ## Setup & Running Locally
 
-### Prerequisites
-- **Node.js** (v18+ recommended)
-- **Yarn** (this repo uses Yarn 3.6.4)
-
-If you don’t already have Yarn:
-```bash
-npm install -g yarn
-```
-
 ### Install Dependencies 
-Clone the repository and install dependencies with Yarn:
+Clone the repository:
 ```bash
 git clone git@github.com:Scanifly/reseller-demo-server.git
 cd reseller-demo-server
-yarn install
 ```
 
 ### Postman
@@ -46,9 +36,31 @@ Place your key ID in the `JWKS_KEY_ID` field in the .env
 The `SCANIFLY_EMAIL` and `SCANIFLY_PASSWORD` values in your .env must be the `admin` of your Scanifly account so that in can interact with the reseller APIs.
 
 ### Running Locally
+
+####
+This app is dockerized and can be run in a container by using the commands in the Makefile
+
 ```bash
-yarn local
+make build-up
 ```
+
+Alternatively if you want to modify the code and see your changes in real time you can run it locally with nodemon.
+
+#### Prerequisites
+- **Node.js** (v18+ recommended)
+- **Yarn** (this repo uses Yarn 3.6.4)
+
+If you don’t already have Yarn:
+```bash
+npm install -g yarn
+```
+
+To run the code locally with nodemon:
+
+```bash
+yarn install && yarn local
+```
+#### Configuring JWKS Validation
 
 Scanifly needs to know the endpoint to reach out to validate a JWT against your JWKS public key.
 
@@ -66,6 +78,8 @@ ngrok http --url=your_ngrok_domain 3001
 ```
 
 Once you have your HTTPS URL you need to tell Scanifly to use that endpoint to validate your JWTs.
+
+The PATCH scanifly/reseller endpoint can be used to accomplish that.
 
 ![Use the PATCH scanifly/reseller endpoint](./docs/postman.png)
 
