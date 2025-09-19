@@ -1,0 +1,699 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Get3dEmbedRequest": {
+				"properties": {
+					"scaniflyUserId": {
+						"type": "string"
+					},
+					"scaniflyProjectId": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"scaniflyDesignId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"scaniflyProjectId",
+					"scaniflyDesignId"
+				],
+				"type": "object"
+			},
+			"AddCompanyToScaniflyResponse": {
+				"properties": {
+					"companyId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"companyId"
+				],
+				"type": "object"
+			},
+			"AddCompanyToScaniflyRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"address": {
+						"properties": {
+							"country": {
+								"type": "string"
+							},
+							"zip": {
+								"type": "string"
+							},
+							"state": {
+								"type": "string"
+							},
+							"city": {
+								"type": "string"
+							},
+							"line": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"country",
+							"zip",
+							"state",
+							"city",
+							"line"
+						],
+						"type": "object"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"address",
+					"name"
+				],
+				"type": "object"
+			},
+			"AddDesignToScaniflyResponse": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"projectId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"updatedAt",
+					"createdAt",
+					"name",
+					"companyId",
+					"projectId"
+				],
+				"type": "object"
+			},
+			"AddDesignToScaniflyRequest": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"scaniflyUserId": {
+						"type": "string"
+					},
+					"scaniflyCompanyId": {
+						"type": "string"
+					},
+					"scaniflyProjectId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"email",
+					"scaniflyUserId",
+					"scaniflyCompanyId",
+					"scaniflyProjectId"
+				],
+				"type": "object"
+			},
+			"AddProjectToScaniflyResponse": {
+				"properties": {
+					"createdById": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"createdBy": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"geolocation": {
+						"properties": {
+							"latitude": {
+								"type": "number",
+								"format": "double"
+							},
+							"longitude": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"latitude",
+							"longitude"
+						],
+						"type": "object"
+					},
+					"address": {
+						"type": "string"
+					},
+					"teammates": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"createdById",
+					"id",
+					"updatedAt",
+					"createdAt",
+					"createdBy",
+					"companyId",
+					"geolocation",
+					"address",
+					"teammates",
+					"name"
+				],
+				"type": "object"
+			},
+			"AddProjectToScaniflyRequest": {
+				"properties": {
+					"scaniflyCompanyId": {
+						"type": "string"
+					},
+					"scaniflyUserId": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string",
+						"description": "Email of user in your system who owns project"
+					},
+					"geolocation": {
+						"properties": {
+							"longitude": {
+								"type": "number",
+								"format": "double"
+							},
+							"latitude": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"longitude",
+							"latitude"
+						],
+						"type": "object"
+					},
+					"address": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"scaniflyCompanyId",
+					"scaniflyUserId",
+					"email",
+					"geolocation",
+					"address",
+					"name"
+				],
+				"type": "object"
+			},
+			"AddUserToScaniflyResponse": {
+				"properties": {
+					"userId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userId"
+				],
+				"type": "object"
+			},
+			"Position": {
+				"enum": [
+					"designer",
+					"surveyor",
+					"salesMarketing",
+					"operationsProjectManager",
+					"installer",
+					"dronePilot"
+				],
+				"type": "string"
+			},
+			"AddUserToScaniflyRequest": {
+				"properties": {
+					"companyId": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"position": {
+						"$ref": "#/components/schemas/Position"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"companyId",
+					"email",
+					"phone",
+					"position",
+					"lastName",
+					"firstName"
+				],
+				"type": "object"
+			},
+			"CompanyForReseller": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"ResellerType": {
+				"properties": {
+					"isActive": {
+						"type": "boolean"
+					},
+					"name": {
+						"type": "string"
+					},
+					"getJwtVerificationKeyEndpoint": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"company": {
+						"$ref": "#/components/schemas/CompanyForReseller"
+					},
+					"authorizedCompanies": {
+						"items": {
+							"$ref": "#/components/schemas/CompanyForReseller"
+						},
+						"type": "array"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"isActive",
+					"name",
+					"getJwtVerificationKeyEndpoint",
+					"updatedAt",
+					"createdAt",
+					"company",
+					"authorizedCompanies",
+					"id"
+				],
+				"type": "object"
+			},
+			"UpdateJwksEndpointRequest": {
+				"properties": {
+					"getJwtVerificationKeyEndpoint": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"getJwtVerificationKeyEndpoint"
+				],
+				"type": "object"
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "scanifly-reseller-demo",
+		"version": "1.0.0",
+		"description": "Demo server to interact with Scanifly APIs to add companies/users to embed into JWT",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/scanifly/3dUrl": {
+			"post": {
+				"operationId": "Get3dEmbed",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieve a URL to the Scanifly 3D embed to render in an iFrame.\nPassing in the `email` and `scaniflyUserId` will allow the user to be authenticated into Scanifly.\nAssuming that the user was created by your reseller or has authorized your reseller",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Get3dEmbedRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/company": {
+			"post": {
+				"operationId": "AddCompanyToScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddCompanyToScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Add a company to the Scanifly system and then use this ID when adding users to the company.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddCompanyToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/design": {
+			"post": {
+				"operationId": "AddDesignToScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddDesignToScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Call this API to add a design into Scanifly and then use this ID when rendering the 3D embed",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddDesignToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/project": {
+			"post": {
+				"operationId": "AddProjectToScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddProjectToScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Call this API to add a project into Scanifly and then save the ID returned to you to associate designs with.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddProjectToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/user": {
+			"post": {
+				"operationId": "AddUserToScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddUserToScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "If a user exists in your system, but not in Scanifly.\nCall this API to add the user into Scanifly and then save the ID returned to you.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddUserToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/reseller": {
+			"patch": {
+				"operationId": "UpdateJwksEndpoint",
+				"responses": {
+					"200": {
+						"description": "Updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResellerType"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Tell Scanifly which HTTPS endpoint to pull the JWKS public key from to validate a signed JWT",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateJwksEndpointRequest"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

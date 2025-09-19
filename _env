@@ -1,0 +1,15 @@
+PORT=3001
+
+SCANIFLY_ENDPOINT="https://api.portal.scanifly.com"
+
+SCANIFLY_EMAIL=your_scanifly_email
+
+SCANIFLY_PASSWORD=your_scanifly_password
+
+SCANIFLY_3D_URL="https://3d.scanifly.com"
+
+JWKS_KEY_ID=must_match_the_kid_field_in_your_jwks_json_file
+
+JWKS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
+your_jwks_private_key_in_PEM_format
+-----END PRIVATE KEY-----"
