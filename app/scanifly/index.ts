@@ -1,1 +1,1 @@
-export { default as ScaniflyService } from './scanifly.service';
+export { default as ScaniflyService } from "./scanifly.service";

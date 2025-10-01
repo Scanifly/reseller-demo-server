@@ -92,3 +92,19 @@ If the user already has a companyId and userId you can skip to step 3.
 3. Create a project in Scanifly for a given address
 4. Create a design in Scanifly to associate with the project
 5. Get a 3D URL
+
+### Permissions and Roles
+
+When creating a user there is a field in the request body named `position`.
+
+Each position has different permissions that control what actions can be performed inside the Scanifly ecosystem by that user.
+
+| Role(s)                                                        | Create Projects | Design Tool | Admin Tools | Remove Media Categories | Simple Design |
+| --------------------------------------- | :-------------: | :---------: | :---------: | :---------------------: | :-----------: |
+| Designer / Installer / Maintenance Tech |        ✅        |      ✅      |      ❌      |            ❌            |       ❌       |
+| Drone Pilot / Surveyor                  |        ✅        |      ❌      |      ❌      |            ❌            |       ❌       |
+| Owner                                   |        ✅        |      ✅      |      ✅      |            ✅            |       ❌       |
+| Operations Project Manager              |        ✅        |      ✅      |      ❌      |            ❌            |       ❌       |
+| Sales Marketing                         |        ❌        |      ❌      |      ❌      |            ❌            |       ✅       |
+
+---
