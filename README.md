@@ -99,12 +99,12 @@ When creating a user there is a field in the request body named `position`.
 
 Each position has different permissions that control what actions can be performed inside the Scanifly ecosystem by that user.
 
-| Role(s)                                                        | Create Projects | Design Tool | Admin Tools | Remove Media Categories | Simple Design |
-| --------------------------------------- | :-------------: | :---------: | :---------: | :---------------------: | :-----------: |
-| Designer / Installer / Maintenance Tech |        ✅        |      ✅      |      ❌      |            ❌            |       ❌       |
-| Drone Pilot / Surveyor                  |        ✅        |      ❌      |      ❌      |            ❌            |       ❌       |
-| Owner                                   |        ✅        |      ✅      |      ✅      |            ✅            |       ❌       |
-| Operations Project Manager              |        ✅        |      ✅      |      ❌      |            ❌            |       ❌       |
-| Sales Marketing                         |        ❌        |      ❌      |      ❌      |            ❌            |       ✅       |
+| Role(s)                                                        | Create Projects | Simple Design| Pro Design |
+| --------------------------------------- | :-------------: | :---------:| :-----------: |
+| Owner                                   |        ✅        |      ✅      |       ✅       |
+| Operations                              |        ✅        |      ✅      |       ✅       |
+| Designer                                |        ✅        |      ✅      |       ✅       |
+| Sales Rep                               |        ✅        |      ✅      |       ❌       |
+| Surveyor / Field Tech                   |        ✅        |      ❌      |       ❌       |
 
 ---
