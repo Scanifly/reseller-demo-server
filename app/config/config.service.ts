@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 class ConfigService {
   // eslint-disable-next-line no-use-before-define
@@ -9,14 +9,14 @@ class ConfigService {
   private constructor() {}
 
   static GetInstance() {
-    if(!ConfigService.#instance) {
+    if (!ConfigService.#instance) {
       ConfigService.#instance = new ConfigService();
     }
     return ConfigService.#instance;
   }
 
   async init() {
-    if(this.#isInitialized) {
+    if (this.#isInitialized) {
       return;
     }
 
@@ -25,31 +25,31 @@ class ConfigService {
   }
 
   getKeyId() {
-    return process.env['JWKS_KEY_ID']!;
+    return process.env["JWKS_KEY_ID"]!;
   }
 
   getPrivateKey() {
-    return process.env['JWKS_PRIVATE_KEY']!;
+    return process.env["JWKS_PRIVATE_KEY"]!;
   }
 
   getPort() {
-    return parseInt(process.env['PORT']!);
+    return parseInt(process.env["PORT"]!);
   }
 
   getScanifly3dUrl() {
-    return process.env['SCANIFLY_3D_URL']!;
+    return process.env["SCANIFLY_3D_URL"]!;
   }
 
   getScaniflyEndpoint() {
-    return process.env['SCANIFLY_ENDPOINT']!;
+    return process.env["SCANIFLY_ENDPOINT"]!;
   }
 
   getScaniflyEmail() {
-    return process.env['SCANIFLY_EMAIL']!;
+    return process.env["SCANIFLY_EMAIL"]!;
   }
 
   getScaniflyPassword() {
-    return process.env['SCANIFLY_PASSWORD']!;
+    return process.env["SCANIFLY_PASSWORD"]!;
   }
 }
 

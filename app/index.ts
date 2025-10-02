@@ -1,4 +1,6 @@
 import Server from "./server";
 
 // Start server
-Server.GetInstance();
+(async () => {
+  await Server.GetInstance(); // don't omit await in ESM/TLA-capable builds
+})();

@@ -10,7 +10,8 @@
 			"Get3dEmbedRequest": {
 				"properties": {
 					"scaniflyUserId": {
-						"type": "string"
+						"type": "string",
+						"description": "Only required if the email in your system does not match the user's email in Scanifly"
 					},
 					"scaniflyProjectId": {
 						"type": "string"
@@ -24,6 +25,7 @@
 				},
 				"required": [
 					"scaniflyProjectId",
+					"email",
 					"scaniflyDesignId"
 				],
 				"type": "object"
@@ -122,7 +124,8 @@
 						"type": "string"
 					},
 					"scaniflyUserId": {
-						"type": "string"
+						"type": "string",
+						"description": "Only required if the email in your system does not match the user's email in Scanifly"
 					},
 					"scaniflyCompanyId": {
 						"type": "string"
@@ -134,9 +137,187 @@
 				"required": [
 					"name",
 					"email",
-					"scaniflyUserId",
 					"scaniflyCompanyId",
 					"scaniflyProjectId"
+				],
+				"type": "object"
+			},
+			"ScaniflyModule": {
+				"properties": {
+					"notes": {
+						"type": "string"
+					},
+					"max_load_snow": {
+						"type": "number",
+						"format": "double",
+						"description": "Maximum snow load in Pascals\nExample: 2600"
+					},
+					"max_load_wind": {
+						"type": "number",
+						"format": "double",
+						"description": "Maximum wind load in Pascals\nExample: 3600"
+					},
+					"weight": {
+						"type": "number",
+						"format": "double",
+						"description": "Weight of the module in pounds\nExample: 40.79"
+					},
+					"cell_quan": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of cells in the module"
+					},
+					"currTemp": {
+						"type": "string",
+						"description": "Current temperature coefficient\nExample: 0.04"
+					},
+					"voltTemp": {
+						"type": "string",
+						"description": "Coltage temperature coefficient\nExample: -0.24"
+					},
+					"powTemp": {
+						"type": "string",
+						"description": "Power temperature coefficient\nExample: -0.3"
+					},
+					"shrtCrc": {
+						"type": "string",
+						"description": "Short circuit current\nExample: 10.79"
+					},
+					"maxSeriesFuse": {
+						"type": "string",
+						"description": "Maximum series fuse rating\nExample: 20"
+					},
+					"opnCirc": {
+						"type": "string",
+						"description": "Open circuit voltage\nExample: 42.7"
+					},
+					"ratCurr": {
+						"type": "string",
+						"description": "Rated current\nExample: 9.77"
+					},
+					"ratVol": {
+						"type": "string",
+						"description": "Rated voltage\nExample: 46.5"
+					},
+					"powTol": {
+						"type": "string",
+						"description": "Power tolerance\nExample: 0/3"
+					},
+					"unitsCurrTemp": {
+						"type": "string",
+						"description": "Current temperature units\nExample: c"
+					},
+					"unitsVoltageTemp": {
+						"type": "string",
+						"description": "Voltage temperature units\nExample: c"
+					},
+					"textureMap": {
+						"type": "string"
+					},
+					"moduleMechType": {
+						"type": "string",
+						"description": "Mechanical type of the module"
+					},
+					"units": {
+						"type": "number",
+						"format": "double"
+					},
+					"moduleHeight": {
+						"type": "number",
+						"format": "double"
+					},
+					"moduleWidth": {
+						"type": "number",
+						"format": "double"
+					},
+					"wattage": {
+						"type": "number",
+						"format": "double"
+					},
+					"manufacturer": {
+						"type": "string"
+					},
+					"model": {
+						"type": "string"
+					},
+					"moduleName": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"powTol",
+					"unitsCurrTemp",
+					"unitsVoltageTemp",
+					"textureMap",
+					"moduleMechType",
+					"units",
+					"moduleHeight",
+					"moduleWidth",
+					"wattage",
+					"manufacturer",
+					"model",
+					"moduleName",
+					"id"
+				],
+				"type": "object"
+			},
+			"AddModuleLibraryToScaniflyResponse": {
+				"properties": {
+					"updatedAt": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"modules": {
+						"properties": {},
+						"additionalProperties": {
+							"$ref": "#/components/schemas/ScaniflyModule"
+						},
+						"type": "object"
+					},
+					"userId": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"modules",
+					"userId",
+					"id"
+				],
+				"type": "object"
+			},
+			"AddModuleLibraryToScaniflyRequest": {
+				"properties": {
+					"scaniflyUserId": {
+						"type": "string",
+						"description": "Only required if the email in your system does not match the user's email in Scanifly"
+					},
+					"email": {
+						"type": "string",
+						"description": "Email of user in your system"
+					},
+					"modules": {
+						"properties": {},
+						"additionalProperties": {
+							"$ref": "#/components/schemas/ScaniflyModule"
+						},
+						"type": "object",
+						"description": "The key is the name of the module"
+					}
+				},
+				"required": [
+					"email",
+					"modules"
 				],
 				"type": "object"
 			},
@@ -210,7 +391,8 @@
 						"type": "string"
 					},
 					"scaniflyUserId": {
-						"type": "string"
+						"type": "string",
+						"description": "Only required if the email in your system does not match the user's email in Scanifly"
 					},
 					"email": {
 						"type": "string",
@@ -242,7 +424,6 @@
 				},
 				"required": [
 					"scaniflyCompanyId",
-					"scaniflyUserId",
 					"email",
 					"geolocation",
 					"address",
@@ -268,7 +449,9 @@
 					"salesMarketing",
 					"operationsProjectManager",
 					"installer",
-					"dronePilot"
+					"dronePilot",
+					"maintenanceTech",
+					"executiveOwnerCEO"
 				],
 				"type": "string"
 			},
@@ -284,7 +467,8 @@
 						"type": "string"
 					},
 					"position": {
-						"$ref": "#/components/schemas/Position"
+						"$ref": "#/components/schemas/Position",
+						"description": "This will control which permissions the user has in the Scanifly ecosystem. \nSee the README section \"Permissions and Roles\""
 					},
 					"lastName": {
 						"type": "string"
@@ -531,6 +715,57 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/AddDesignToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/module-library": {
+			"post": {
+				"operationId": "AddModuleLibraryToScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddModuleLibraryToScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Call this API to add a module library into Scanifly for users to interact with on the design canvas",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddModuleLibraryToScaniflyRequest"
 							}
 						}
 					}
