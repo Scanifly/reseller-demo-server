@@ -448,9 +448,7 @@
 					"surveyor",
 					"salesMarketing",
 					"operationsProjectManager",
-					"installer",
 					"dronePilot",
-					"maintenanceTech",
 					"executiveOwnerCEO"
 				],
 				"type": "string"
@@ -468,7 +466,7 @@
 					},
 					"position": {
 						"$ref": "#/components/schemas/Position",
-						"description": "This will control which permissions the user has in the Scanifly ecosystem. \nSee the README section \"Permissions and Roles\""
+						"description": "This will control which permissions the user has in the Scanifly ecosystem.\nSee the README section \"Permissions and Roles\""
 					},
 					"lastName": {
 						"type": "string"
