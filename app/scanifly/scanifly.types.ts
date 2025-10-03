@@ -1,13 +1,4 @@
-enum Position {
-  designer = "designer",
-  surveyor = "surveyor",
-  salesMarketing = "salesMarketing",
-  operationsProjectManager = "operationsProjectManager",
-  installer = "installer",
-  dronePilot = "dronePilot",
-  maintenanceTech = "maintenanceTech",
-  owner = "executiveOwnerCEO",
-}
+import { Permission, Position, Role, UserStatus } from "./scanifly.enums";
 
 type AddCompanyToScaniflyRequest = {
   name: string;
@@ -158,17 +149,6 @@ type Get3dEmbedRequest = {
   scaniflyUserId?: string;
 };
 
-enum Permission {
-  adminTools = "adminTools",
-  billing = "billing",
-  upload = "upload",
-  watt3d = "watt3d",
-  removeMediaCategories = "removeMediaCategories",
-  simpleDesign = "simpleDesign",
-  salesManager = "salesManager",
-  simpleDesignTechnical = "simpleDesignTechnical",
-}
-
 type ResellerType = {
   id: string;
   authorizedCompanies: CompanyForReseller[];
@@ -179,11 +159,6 @@ type ResellerType = {
   name: string;
   isActive: boolean;
 };
-
-enum Role {
-  admin = "admin",
-  default = "default",
-}
 
 type ScaniflyAuthenticationRequest = {
   email: string;
@@ -309,12 +284,6 @@ type UpdateJwksEndpointRequest = {
   getJwtVerificationKeyEndpoint: string;
 };
 
-enum UserStatus {
-  active = "active",
-  inactive = "inactive",
-  frozen = "frozen",
-}
-
 export type {
   AddCompanyToScaniflyRequest,
   AddCompanyToScaniflyResponse,
@@ -330,7 +299,6 @@ export type {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
-  Position,
   ResellerType,
   ScaniflyAuthenticationRequest,
   ScaniflyAuthenticationResponse,
