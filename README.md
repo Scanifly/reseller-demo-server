@@ -23,7 +23,7 @@ Copy the environment variable template file from `_env` to `.env`
 cp _env .env
 ```
 
-Your JWKS algorithm must be RS256.
+Your JWKS algorithm must be RS256 and you private key exported in PEM format.
 
 If you do not already have a JWKS you can generate one for testing [here](https://jwkset.com/generate)
 
