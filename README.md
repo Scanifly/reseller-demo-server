@@ -23,13 +23,13 @@ Copy the environment variable template file from `_env` to `.env`
 cp _env .env
 ```
 
+Your JWKS algorithm must be RS256.
+
 If you do not already have a JWKS you can generate one for testing [here](https://jwkset.com/generate)
 
 Place your private key in the `JWKS_PRIVATE_KEY` field in the .env.
 
 Take the public key and put it in the `/app/jwks.json` file inside the `keys` array.
-
-Your JWKS algorithm must be RS256.
 
 Place your key ID in the `JWKS_KEY_ID` field in the .env
 
