@@ -431,6 +431,34 @@
 				],
 				"type": "object"
 			},
+			"PurchaseCreditsInScaniflyResponse": {
+				"properties": {
+					"totalBalance": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"totalBalance"
+				],
+				"type": "object"
+			},
+			"PurchaseCreditsInScaniflyRequest": {
+				"properties": {
+					"scaniflyCompanyId": {
+						"type": "string"
+					},
+					"creditCount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"scaniflyCompanyId",
+					"creditCount"
+				],
+				"type": "object"
+			},
 			"AddUserToScaniflyResponse": {
 				"properties": {
 					"userId": {
@@ -815,6 +843,57 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/AddProjectToScaniflyRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/credit": {
+			"post": {
+				"operationId": "PurchaseCreditsInScanifly",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PurchaseCreditsInScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "If you want to give a company/user the ability to spend nearmap credits\nCall this API to add credits to the company in Scanifly",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PurchaseCreditsInScaniflyRequest"
 							}
 						}
 					}

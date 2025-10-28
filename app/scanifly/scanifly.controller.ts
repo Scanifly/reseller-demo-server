@@ -21,6 +21,8 @@ import {
   AddUserToScaniflyRequest,
   AddUserToScaniflyResponse,
   Get3dEmbedRequest,
+  PurchaseCreditsInScaniflyRequest,
+  PurchaseCreditsInScaniflyResponse,
   ResellerType,
   UpdateJwksEndpointRequest,
 } from "./scanifly.types";
@@ -124,6 +126,27 @@ class ScaniflyController extends Controller {
   ): Promise<AddProjectToScaniflyResponse> {
     try {
       const result = await this.#scaniflyService.addProject(requestBody);
+      return result;
+    } catch (err: any) {
+      console.error(err);
+      return validationErrorResponse(400, { message: err.message });
+    }
+  }
+
+  /**
+   * If you want to give a company/user the ability to spend nearmap credits
+   * Call this API to add credits to the company in Scanifly
+   * @note This requires a company ID to exist in Scanifly to purchase the credits for
+   * @returns updated balance
+   */
+  @SuccessResponse("201", "Created")
+  @Post("/credit")
+  public async purchaseCreditsInScanifly(
+    @Body() requestBody: PurchaseCreditsInScaniflyRequest,
+    @Res() validationErrorResponse: TsoaResponse<400, { message: string }>,
+  ): Promise<PurchaseCreditsInScaniflyResponse> {
+    try {
+      const result = await this.#scaniflyService.purchaseCredits(requestBody);
       return result;
     } catch (err: any) {
       console.error(err);

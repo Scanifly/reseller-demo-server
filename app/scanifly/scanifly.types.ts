@@ -149,6 +149,25 @@ type Get3dEmbedRequest = {
   scaniflyUserId?: string;
 };
 
+type PurchaseCreditsBody = {
+  companyId: string;
+  creditCount: number;
+};
+
+type PurchaseCreditsResponse = {
+  amount: number;
+  transactionSuccessful: boolean;
+};
+
+type PurchaseCreditsInScaniflyRequest = {
+  creditCount: number;
+  scaniflyCompanyId: string;
+};
+
+type PurchaseCreditsInScaniflyResponse = {
+  totalBalance: number;
+};
+
 type ResellerType = {
   id: string;
   authorizedCompanies: CompanyForReseller[];
@@ -299,6 +318,10 @@ export type {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
+  PurchaseCreditsBody,
+  PurchaseCreditsResponse,
+  PurchaseCreditsInScaniflyRequest,
+  PurchaseCreditsInScaniflyResponse,
   ResellerType,
   ScaniflyAuthenticationRequest,
   ScaniflyAuthenticationResponse,

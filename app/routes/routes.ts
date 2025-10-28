@@ -62,6 +62,16 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyCompanyId":{"dataType":"string","required":true},"scaniflyUserId":{"dataType":"string"},"email":{"dataType":"string","required":true},"geolocation":{"dataType":"nestedObjectLiteral","nestedProperties":{"longitude":{"dataType":"double","required":true},"latitude":{"dataType":"double","required":true}},"required":true},"address":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PurchaseCreditsInScaniflyResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"totalBalance":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PurchaseCreditsInScaniflyRequest": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyCompanyId":{"dataType":"string","required":true},"creditCount":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddUserToScaniflyResponse": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userId":{"dataType":"string","required":true}},"validators":{}},
@@ -253,6 +263,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'addProjectToScanifly',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsScaniflyController_purchaseCreditsInScanifly: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"PurchaseCreditsInScaniflyRequest"},
+                validationErrorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+        };
+        app.post('/scanifly/credit',
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController)),
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController.prototype.purchaseCreditsInScanifly)),
+
+            async function ScaniflyController_purchaseCreditsInScanifly(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsScaniflyController_purchaseCreditsInScanifly, request, response });
+
+                const controller = new ScaniflyController();
+
+              await templateService.apiHandler({
+                methodName: 'purchaseCreditsInScanifly',
                 controller,
                 response,
                 next,

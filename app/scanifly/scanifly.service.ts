@@ -15,6 +15,10 @@ import {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
+  PurchaseCreditsBody,
+  PurchaseCreditsInScaniflyRequest,
+  PurchaseCreditsInScaniflyResponse,
+  PurchaseCreditsResponse,
   ResellerType,
   ScaniflyAuthenticationRequest,
   ScaniflyAuthenticationResponse,
@@ -401,6 +405,50 @@ class ScaniflyService {
       },
     });
     return result.data.id;
+  }
+
+  /**
+   * If you want to give a company/user the ability to spend nearmap credits
+   * Call this API to add credits to the company in Scanifly
+   * @note This requires a company ID to exist in Scanifly to purchase the credits for
+   * @returns updated balance
+   */
+  async purchaseCredits(
+    {
+      scaniflyCompanyId,
+      ...rest
+    }: PurchaseCreditsInScaniflyRequest,
+  ): Promise<PurchaseCreditsInScaniflyResponse> {
+    try {
+      const result = await axios.request<
+        PurchaseCreditsResponse,
+        AxiosResponse<PurchaseCreditsResponse>,
+        PurchaseCreditsBody
+      >({
+        url: `${this.#scaniflyUrl}/reseller/subscription/credits`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${await this.getAuthToken()}`,
+        },
+        data: {
+          ...rest,
+          companyId: scaniflyCompanyId,
+        },
+      });
+      return {
+        totalBalance: result.data.amount,
+      }
+    } catch (err: any) {
+      if (err instanceof AxiosError) {
+        console.error(
+          `HTTP request failed with status code ${err.response?.status} ${err.response?.data?.message}`,
+        );
+        throw new Error(
+          err.response?.data.message ?? err.response?.statusText ?? err.message,
+        );
+      }
+      throw err;
+    }
   }
 
   /**
