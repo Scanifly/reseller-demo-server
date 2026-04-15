@@ -51,6 +51,14 @@ class ConfigService {
   getScaniflyPassword() {
     return process.env["SCANIFLY_PASSWORD"]!;
   }
+
+  getCorsOrigin() {
+    return process.env["CORS_ORIGIN"]!;
+  }
+
+  getJwtIssuer() {
+    return process.env["JWT_ISSUER"]!;
+  }
 }
 
 export default ConfigService;

@@ -1,5 +1,9 @@
 ## Scanifly Reseller Demo Server
 
+> **For local development and evaluation only.**
+>
+> This server has **no authentication** on any of its endpoints. Every API route — including user creation, credit purchases, JWT signing, and JWKS endpoint registration — is open to any caller that can reach the server. Before adapting this code for a real deployment you must add authentication middleware that verifies every incoming request comes from your own application.
+
 This is a NodeJS/Express HTTP server that will allow you to quickly test the Scanifly reseller APIs and see how to get your JWKS setup to be able to sign JWT's that Scanifly can then validate and use to authenticate your users into it's system.
 
 ## Setup & Running Locally
