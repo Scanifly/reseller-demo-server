@@ -79,12 +79,22 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Position": {
         "dataType": "refEnum",
-        "enums": ["designer","surveyor","salesMarketing","operationsProjectManager","dronePilot","executiveOwnerCEO"],
+        "enums": ["designer","surveyor","financeProcurement","salesMarketing","operationsProjectManager","installer","executiveOwnerCEO","thirdPartyEngineer","dronePilot","maintenanceTech","guest"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Role": {
+        "dataType": "refEnum",
+        "enums": ["admin","default"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Permission": {
+        "dataType": "refEnum",
+        "enums": ["adminTools","billing","upload","download","uploadMedia","watt3d","simpleDesign","simpleDesignTechnical","viewMyProjects","editCompanyModuleLibrary","proposalManage","proposalCreate","proposalViewOnly","proposalTemplateManage","removeMediaCategories"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddUserToScaniflyRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"companyId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"phone":{"dataType":"string","required":true},"position":{"ref":"Position","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"permissions":{"dataType":"array","array":{"dataType":"refEnum","ref":"Permission"}},"roles":{"dataType":"array","array":{"dataType":"refEnum","ref":"Role"}},"companyId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"phone":{"dataType":"string","required":true},"position":{"ref":"Position","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CompanyForReseller": {

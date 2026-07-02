@@ -474,15 +474,63 @@
 				"enum": [
 					"designer",
 					"surveyor",
+					"financeProcurement",
 					"salesMarketing",
 					"operationsProjectManager",
+					"installer",
+					"executiveOwnerCEO",
+					"thirdPartyEngineer",
 					"dronePilot",
-					"executiveOwnerCEO"
+					"maintenanceTech",
+					"guest"
+				],
+				"type": "string"
+			},
+			"Role": {
+				"description": "Roles a reseller is allowed to assign to a user.\nScanifly's `/api/v1/reseller/user` endpoint only permits `admin` and `default`.",
+				"enum": [
+					"admin",
+					"default"
+				],
+				"type": "string"
+			},
+			"Permission": {
+				"description": "Permissions a reseller is allowed to assign to a user.\nMirrors the allow-list enforced by Scanifly's `/api/v1/reseller/user` endpoint,\nwhich accepts every permission except the deprecated `salesManager` and `mobile`.",
+				"enum": [
+					"adminTools",
+					"billing",
+					"upload",
+					"download",
+					"uploadMedia",
+					"watt3d",
+					"simpleDesign",
+					"simpleDesignTechnical",
+					"viewMyProjects",
+					"editCompanyModuleLibrary",
+					"proposalManage",
+					"proposalCreate",
+					"proposalViewOnly",
+					"proposalTemplateManage",
+					"removeMediaCategories"
 				],
 				"type": "string"
 			},
 			"AddUserToScaniflyRequest": {
 				"properties": {
+					"permissions": {
+						"items": {
+							"$ref": "#/components/schemas/Permission"
+						},
+						"type": "array",
+						"description": "Optional. Overrides the permissions derived from `position`.\nOmit to inherit the position's default permissions."
+					},
+					"roles": {
+						"items": {
+							"$ref": "#/components/schemas/Role"
+						},
+						"type": "array",
+						"description": "Optional. Overrides the roles derived from `position`.\nOnly `admin` and `default` may be assigned by a reseller.\nOmit to default to `[default]`."
+					},
 					"companyId": {
 						"type": "string"
 					},

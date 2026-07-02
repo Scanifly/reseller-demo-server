@@ -113,4 +113,48 @@ Each position has different permissions that control what actions can be perform
 | Sales Rep                               |        ✅        |      ✅      |       ❌       |
 | Surveyor / Field Tech                   |        ✅        |      ❌      |       ❌       |
 
+#### Overriding the position defaults
+
+`position` still sets the user's **default** role and permissions. To create users
+whose access does not match a position preset — most commonly a company **admin** —
+the create-user request (`POST /scanifly/user`) accepts two optional fields that
+override those defaults:
+
+| Field | Type | Effect |
+| --- | --- | --- |
+| `roles` | `string[]` | Replaces the default role. Resellers may assign only `admin` or `default`. Omit to default to `default`. |
+| `permissions` | `string[]` | Replaces the position's default permissions entirely. Omit to inherit the position defaults. |
+
+Both fields are **optional** and independent — you can override the role, the
+permissions, or both. When a field is omitted the position-derived default is used,
+so existing integrations are unaffected.
+
+**Create an admin** by sending `roles: ["admin"]` (typically alongside the
+`adminTools` permission):
+
+```jsonc
+POST /scanifly/user
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "phone": "+1 555 123 4567",
+  "companyId": "<scanifly company id>",
+  "position": "executiveOwnerCEO",
+  "roles": ["admin"],
+  "permissions": ["adminTools", "billing", "upload", "watt3d"]
+}
+```
+
+Assignable `permissions` values: `adminTools`, `billing`, `upload` (create new
+projects), `download`, `uploadMedia`, `watt3d`, `simpleDesign`,
+`simpleDesignTechnical`, `viewMyProjects`, `editCompanyModuleLibrary`,
+`proposalManage`, `proposalCreate`, `proposalViewOnly`, `proposalTemplateManage`,
+`removeMediaCategories`. The deprecated `salesManager` and `mobile` permissions are
+rejected.
+
+> These fields are surfaced in the demo client under the **Create User** tab — the
+> position dropdown sets the defaults, and the optional role dropdown and permission
+> checkboxes apply the overrides above.
+
 ---

@@ -128,6 +128,17 @@ type AddUserToScaniflyRequest = {
   phone: string;
   email: string;
   companyId: string;
+  /**
+   * Optional. Overrides the roles derived from `position`.
+   * Only `admin` and `default` may be assigned by a reseller.
+   * Omit to default to `[default]`.
+   */
+  roles?: Role[];
+  /**
+   * Optional. Overrides the permissions derived from `position`.
+   * Omit to inherit the position's default permissions.
+   */
+  permissions?: Permission[];
 };
 
 type AddUserToScaniflyResponse = {
