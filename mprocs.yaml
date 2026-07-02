@@ -8,5 +8,6 @@ procs:
 
   client:
     # Vite dev server on :5173, proxies /scanifly -> localhost:3002 (the server).
+    # client/ is a standalone Yarn 3 project (its own yarn.lock + .yarnrc.yml).
     shell: "yarn dev"
     cwd: "<CONFIG_DIR>/client"

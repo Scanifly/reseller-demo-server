@@ -25,11 +25,20 @@ yarn open-3d      # CLI: sign a JWT and open the 3D viewer in the browser
 
 ### Frontend (`client/`)
 
+The client is a standalone **Yarn 3** project with its own `yarn.lock` and `.yarnrc.yml` (separate from the backend's Yarn project at the repo root). Run yarn commands from inside `client/`.
+
 ```bash
 cd client
+yarn install      # First-time setup
 yarn dev          # Vite dev server on port 5173 (proxies /scanifly → localhost:3002)
 yarn build        # Type-check + Vite bundle to client/dist/
 yarn preview      # Preview the production build
+```
+
+### Both at once
+
+```bash
+make dev          # mprocs: dockerized backend + Vite client in one view
 ```
 
 ### Docker

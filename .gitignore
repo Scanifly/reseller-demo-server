@@ -4,5 +4,12 @@
 /dist
 /client/dist
 
+# Yarn (client is a standalone Yarn 3 project) — keep yarn.lock, ignore local cache/state
+/client/.yarn/cache
+/client/.yarn/install-state.gz
+
 # Local environment — copy _env to .env and fill in your credentials. Never commit .env.
 .env
+
+# mprocs runtime log
+mprocs.log
