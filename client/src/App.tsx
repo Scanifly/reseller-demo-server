@@ -301,7 +301,7 @@ function usePersistedArray(key: string) {
   return [value, set] as const;
 }
 
-type Tab = "createUser" | "viewer";
+type Tab = "createUser" | "createProject" | "viewer";
 
 function App() {
   const [tab, setTab] = useState<Tab>("createUser");
@@ -336,6 +336,37 @@ function App() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
+
+  // --- Create project & design form state ---
+  const [cpdEmail, setCpdEmail] = usePersistedString("scanifly_cpd_email");
+  const [cpdCompanyId, setCpdCompanyId] = usePersistedString(
+    "scanifly_cpd_company",
+  );
+  const [cpdUserId, setCpdUserId] = usePersistedString("scanifly_cpd_user_id");
+  const [projectName, setProjectName] = usePersistedString(
+    "scanifly_cpd_project_name",
+    "Demo Project",
+  );
+  const [designName, setDesignName] = usePersistedString(
+    "scanifly_cpd_design_name",
+    "Demo Design",
+  );
+  const [address, setAddress] = usePersistedString(
+    "scanifly_cpd_address",
+    "1 Market St, San Francisco, CA 94105",
+  );
+  const [latitude, setLatitude] = usePersistedString(
+    "scanifly_cpd_lat",
+    "37.7936",
+  );
+  const [longitude, setLongitude] = usePersistedString(
+    "scanifly_cpd_lng",
+    "-122.3965",
+  );
+  const [cpdCreating, setCpdCreating] = useState(false);
+  const [cpdError, setCpdError] = useState<string | null>(null);
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+  const [createdDesignId, setCreatedDesignId] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -427,6 +458,91 @@ function App() {
     setTab("viewer");
   };
 
+  const openCreatedUserInProjectTab = () => {
+    if (!createdUserId) return;
+    setCpdEmail(cuEmail);
+    setCpdCompanyId(companyId);
+    setCpdUserId(createdUserId);
+    setTab("createProject");
+  };
+
+  const handleCreateProjectAndDesign = async (e: FormEvent) => {
+    e.preventDefault();
+    setCpdError(null);
+    setCreatedProjectId(null);
+    setCreatedDesignId(null);
+
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      setCpdError("Latitude and longitude must be valid numbers.");
+      return;
+    }
+
+    setCpdCreating(true);
+    try {
+      // 1. Create the project owned by the (optionally specified) user.
+      const projectRes = await fetch("/scanifly/project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: projectName,
+          address,
+          geolocation: { latitude: lat, longitude: lng },
+          email: cpdEmail,
+          scaniflyCompanyId: cpdCompanyId,
+          ...(cpdUserId && { scaniflyUserId: cpdUserId }),
+        }),
+      });
+
+      if (!projectRes.ok) {
+        const body = await projectRes.json().catch(() => null);
+        throw new Error(
+          body?.message ?? `Server responded with ${projectRes.status}`,
+        );
+      }
+
+      const project: { id: string } = await projectRes.json();
+      setCreatedProjectId(project.id);
+
+      // 2. Create a design against the project we just created.
+      const designRes = await fetch("/scanifly/design", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scaniflyProjectId: project.id,
+          scaniflyCompanyId: cpdCompanyId,
+          email: cpdEmail,
+          name: designName,
+          ...(cpdUserId && { scaniflyUserId: cpdUserId }),
+        }),
+      });
+
+      if (!designRes.ok) {
+        const body = await designRes.json().catch(() => null);
+        throw new Error(
+          body?.message ?? `Server responded with ${designRes.status}`,
+        );
+      }
+
+      const design: { id: string } = await designRes.json();
+      setCreatedDesignId(design.id);
+    } catch (err) {
+      setCpdError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setCpdCreating(false);
+    }
+  };
+
+  const openCreatedProjectInViewer = () => {
+    if (!createdProjectId || !createdDesignId) return;
+    setEmail(cpdEmail);
+    setProjectId(createdProjectId);
+    setDesignId(createdDesignId);
+    setUserId(cpdUserId);
+    setTab("viewer");
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -446,6 +562,13 @@ function App() {
             onClick={() => setTab("createUser")}
           >
             Create User
+          </TabButton>
+          <TabButton
+            type="button"
+            $active={tab === "createProject"}
+            onClick={() => setTab("createProject")}
+          >
+            Create Project &amp; Design
           </TabButton>
           <TabButton
             type="button"
@@ -584,9 +707,146 @@ function App() {
               {createdUserId && (
                 <SuccessMessage>
                   User created. Scanifly user ID: <code>{createdUserId}</code>
+                  <LinkButton
+                    type="button"
+                    onClick={openCreatedUserInProjectTab}
+                  >
+                    Create a project &amp; design for this user →
+                  </LinkButton>
                   <LinkButton type="button" onClick={openCreatedUserInViewer}>
                     Open this user in the 3D Viewer →
                   </LinkButton>
+                </SuccessMessage>
+              )}
+            </Form>
+          </Card>
+        )}
+
+        {tab === "createProject" && (
+          <Card>
+            <Form onSubmit={handleCreateProjectAndDesign}>
+              <FieldGroup>
+                <Label htmlFor="cpdEmail">
+                  Email Address <Hint>(user who will own the project)</Hint>
+                </Label>
+                <Input
+                  id="cpdEmail"
+                  type="email"
+                  placeholder="jane@example.com"
+                  value={cpdEmail}
+                  onChange={(e) => setCpdEmail(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="cpdCompanyId">Company ID</Label>
+                <Input
+                  id="cpdCompanyId"
+                  type="text"
+                  placeholder="Scanifly company ID that owns the project"
+                  value={cpdCompanyId}
+                  onChange={(e) => setCpdCompanyId(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="cpdUserId">
+                  Scanifly User ID <Hint>(optional)</Hint>
+                </Label>
+                <Input
+                  id="cpdUserId"
+                  type="text"
+                  placeholder="Only needed if email differs from Scanifly email"
+                  value={cpdUserId}
+                  onChange={(e) => setCpdUserId(e.target.value)}
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input
+                  id="projectName"
+                  type="text"
+                  placeholder="Demo Project"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="designName">Design Name</Label>
+                <Input
+                  id="designName"
+                  type="text"
+                  placeholder="Demo Design"
+                  value={designName}
+                  onChange={(e) => setDesignName(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  type="text"
+                  placeholder="1 Market St, San Francisco, CA 94105"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="latitude">Latitude</Label>
+                <Input
+                  id="latitude"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="37.7936"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Label htmlFor="longitude">Longitude</Label>
+                <Input
+                  id="longitude"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="-122.3965"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  required
+                />
+              </FieldGroup>
+
+              <SubmitButton type="submit" disabled={cpdCreating}>
+                {cpdCreating ? "Creating…" : "Create Project & Design"}
+              </SubmitButton>
+
+              {cpdError && <ErrorMessage>{cpdError}</ErrorMessage>}
+
+              {createdProjectId && (
+                <SuccessMessage>
+                  Project created. Project ID: <code>{createdProjectId}</code>
+                  {createdDesignId ? (
+                    <>
+                      <br />
+                      Design created. Design ID: <code>{createdDesignId}</code>
+                      <LinkButton
+                        type="button"
+                        onClick={openCreatedProjectInViewer}
+                      >
+                        Open in the 3D Viewer →
+                      </LinkButton>
+                    </>
+                  ) : null}
                 </SuccessMessage>
               )}
             </Form>
