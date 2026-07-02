@@ -1,0 +1,12 @@
+procs:
+  server:
+    # Build + run the backend in its Docker container. Runs in the foreground
+    # (no -d) so mprocs captures the logs and a stop sends SIGTERM, which
+    # docker compose handles by tearing the containers down cleanly.
+    shell: "docker compose -f docker/docker-compose.yml up --build"
+    cwd: "<CONFIG_DIR>"
+
+  client:
+    # Vite dev server on :5173, proxies /scanifly -> localhost:3002 (the server).
+    shell: "yarn dev"
+    cwd: "<CONFIG_DIR>/client"
