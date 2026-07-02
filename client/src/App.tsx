@@ -129,10 +129,10 @@ const IframeWrapper = styled.div`
 `;
 
 function App() {
-  const [email, setEmail] = useState("");
-  const [projectId, setProjectId] = useState("");
-  const [designId, setDesignId] = useState("");
-  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("scanifly_viewer_email") ?? "");
+  const [projectId, setProjectId] = useState(() => localStorage.getItem("scanifly_viewer_project_id") ?? "");
+  const [designId, setDesignId] = useState(() => localStorage.getItem("scanifly_viewer_design_id") ?? "");
+  const [userId, setUserId] = useState(() => localStorage.getItem("scanifly_viewer_user_id") ?? "");
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -192,7 +192,7 @@ function App() {
                 type="email"
                 placeholder="user@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); localStorage.setItem("scanifly_viewer_email", e.target.value); }}
                 required
               />
             </FieldGroup>
@@ -204,7 +204,7 @@ function App() {
                 type="text"
                 placeholder="Project ID"
                 value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
+                onChange={(e) => { setProjectId(e.target.value); localStorage.setItem("scanifly_viewer_project_id", e.target.value); }}
                 required
               />
             </FieldGroup>
@@ -216,7 +216,7 @@ function App() {
                 type="text"
                 placeholder="Design ID"
                 value={designId}
-                onChange={(e) => setDesignId(e.target.value)}
+                onChange={(e) => { setDesignId(e.target.value); localStorage.setItem("scanifly_viewer_design_id", e.target.value); }}
                 required
               />
             </FieldGroup>
@@ -233,7 +233,7 @@ function App() {
                 type="text"
                 placeholder="Only needed if email differs from Scanifly email"
                 value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                onChange={(e) => { setUserId(e.target.value); localStorage.setItem("scanifly_viewer_user_id", e.target.value); }}
               />
             </FieldGroup>
 
