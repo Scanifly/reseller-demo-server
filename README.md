@@ -78,7 +78,7 @@ Assuming you have a paid account and have a static domain on ngrok.
 
 On Mac you serve this demo server via that endpoint:
 ```bash
-ngrok http --url=your_ngrok_domain 3001
+ngrok http --url=your_ngrok_domain 3002
 ```
 
 Once you have your HTTPS URL you need to tell Scanifly to use that endpoint to validate your JWTs.

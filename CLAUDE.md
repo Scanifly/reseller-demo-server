@@ -55,8 +55,8 @@ All major backend services use a singleton pattern:
 ### Request Flow (3D viewer embed)
 
 1. Frontend POSTs `{ email, projectId, designId, userId? }` to `POST /scanifly/3dUrl`
-2. Controller calls `ScaniflyService.get3dEmbed()` which fetches the base embed URL from Scanifly
-3. `AuthService` signs a JWT (`iss`, `aud: "scanifly"`, `sub: email`, `iss_scanifly_company_id`, 24h expiry)
+2. Controller calls `ScaniflyService.get3dEmbed()`, which constructs the base embed URL locally from `SCANIFLY_3D_URL` and the project/design IDs
+3. `AuthService` signs a JWT (`iss`, `aud: "scanifly"`, `sub: email`, `iss_scanifly_company_id`, 1h expiry)
 4. The signed JWT is appended as a query param to the embed URL
 5. Frontend renders the URL in an `<iframe>`
 6. Scanifly validates the JWT by fetching the public JWKS from `/.well-known/jwks.json`
@@ -71,7 +71,7 @@ Copy `_env` to `.env` before running locally. Key variables:
 
 | Variable | Purpose |
 |---|---|
-| `PORT` | Backend listen port (default 3001; docker-compose maps 3002) |
+| `PORT` | Backend listen port (no default; `_env` and docker-compose use 3002) |
 | `SCANIFLY_ENDPOINT` | Scanifly API base URL |
 | `SCANIFLY_EMAIL` / `SCANIFLY_PASSWORD` | Service account credentials |
 | `SCANIFLY_3D_URL` | Base URL for 3D viewer |
