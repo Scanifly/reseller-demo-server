@@ -2,9 +2,10 @@ PORT=3002
 
 SCANIFLY_ENDPOINT="https://api.portal.scanifly.com"
 
-SCANIFLY_EMAIL=your_scanifly_email
-
-SCANIFLY_PASSWORD=your_scanifly_password
+# API key for an admin user of your reseller company. Generate one in the Scanifly
+# portal (or ask Scanifly to provision it) and paste it here. Sent as the
+# `x-api-token` header on every /api/v1 reseller request.
+SCANIFLY_API_KEY=your_scanifly_api_key
 
 SCANIFLY_3D_URL="https://3d.scanifly.com"
 

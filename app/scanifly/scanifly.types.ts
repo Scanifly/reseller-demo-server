@@ -179,16 +179,6 @@ type ResellerType = {
   isActive: boolean;
 };
 
-type ScaniflyAuthenticationRequest = {
-  email: string;
-  password: string;
-};
-
-type ScaniflyAuthenticationResponse = {
-  accessToken: string;
-  refreshToken: string;
-};
-
 type ScaniflyModule = {
   id: string;
   moduleName: string;
@@ -323,8 +313,6 @@ export type {
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   ResellerType,
-  ScaniflyAuthenticationRequest,
-  ScaniflyAuthenticationResponse,
   ScaniflyUser,
   UpdateJwksEndpointRequest,
 };

@@ -48,7 +48,7 @@ make logs         # tail reseller-demo-server logs
 All major backend services use a singleton pattern:
 
 - `ConfigService` — reads `.env` and exposes typed getters for each env var
-- `ScaniflyService` — wraps all Scanifly REST API calls; manages a cached bearer token with auto-refresh when < 2 min remain
+- `ScaniflyService` — wraps all Scanifly REST API calls. Reseller-admin operations (create company/user, purchase credits, update JWKS endpoint, look up the reseller's company ID) hit the `/api/v1/*` endpoints authenticated with an API key (`x-api-token` header, from `SCANIFLY_API_KEY`). Project/design creation and the 3D embed instead use the RS256 JWT signed by `AuthService`, against the non-versioned endpoints
 - `AuthService` — signs RS256 JWTs using the private key from config
 - `Server` — Express singleton; bootstraps middleware, TSOA routes, and shutdown handlers
 
@@ -73,7 +73,7 @@ Copy `_env` to `.env` before running locally. Key variables:
 |---|---|
 | `PORT` | Backend listen port (no default; `_env` and docker-compose use 3002) |
 | `SCANIFLY_ENDPOINT` | Scanifly API base URL |
-| `SCANIFLY_EMAIL` / `SCANIFLY_PASSWORD` | Service account credentials |
+| `SCANIFLY_API_KEY` | API key for an admin user of your reseller company; sent as `x-api-token` on `/api/v1` reseller calls |
 | `SCANIFLY_3D_URL` | Base URL for 3D viewer |
 | `JWKS_KEY_ID` | Must match `kid` in `app/jwks.json` |
 | `JWKS_PRIVATE_KEY` | RSA private key (PEM, PKCS#8 format) |

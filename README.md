@@ -37,7 +37,9 @@ Take the public key and put it in the `/app/jwks.json` file inside the `keys` ar
 
 Place your key ID in the `JWKS_KEY_ID` field in the .env
 
-The `SCANIFLY_EMAIL` and `SCANIFLY_PASSWORD` values in your .env must be the `admin` of your Scanifly account so that in can interact with the reseller APIs.
+The `SCANIFLY_API_KEY` value in your .env must be an API key belonging to an `admin` user of your Scanifly reseller account. This key is sent as the `x-api-token` header and authenticates the reseller API calls (create company/user, purchase credits, update JWKS endpoint) against the `/api/v1` endpoints. Generate the key in the Scanifly portal, or ask Scanifly to provision one for you.
+
+> Project and design creation, and the 3D embed itself, are authenticated with the RS256 JWT that this server signs on your behalf (see JWKS setup below) — not the API key.
 
 ### Running Locally
 
