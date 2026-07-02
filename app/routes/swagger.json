@@ -30,6 +30,28 @@
 				],
 				"type": "object"
 			},
+			"CompanyForReseller": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"ListResellerCompaniesResponse": {
+				"items": {
+					"$ref": "#/components/schemas/CompanyForReseller"
+				},
+				"type": "array",
+				"description": "The companies this reseller may act on (its own company plus any that have\nauthorized it), returned to the client to populate the company dropdown."
+			},
 			"AddCompanyToScaniflyResponse": {
 				"properties": {
 					"companyId": {
@@ -561,21 +583,6 @@
 				],
 				"type": "object"
 			},
-			"CompanyForReseller": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"id": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name",
-					"id"
-				],
-				"type": "object"
-			},
 			"ResellerType": {
 				"properties": {
 					"isActive": {
@@ -691,6 +698,47 @@
 						}
 					}
 				}
+			}
+		},
+		"/scanifly/companies": {
+			"get": {
+				"operationId": "ListCompanies",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ListResellerCompaniesResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "List the companies this reseller can create users/projects/designs for\n(its own company plus any that have authorized it).\nUsed by the client to populate the company dropdown.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/scanifly/company": {

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -301,10 +301,100 @@ function usePersistedArray(key: string) {
   return [value, set] as const;
 }
 
+/** A company the reseller has access to, as returned by `GET /scanifly/companies`. */
+type Company = { id: string; name: string };
+
+/**
+ * Company picker backed by the companies the reseller has access to. Falls back
+ * to showing the raw persisted ID as an option so a previously-saved value is
+ * never silently dropped while the list is loading or if it is no longer listed.
+ */
+function CompanySelect({
+  id,
+  value,
+  onChange,
+  companies,
+  loading,
+  error,
+}: {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  companies: Company[];
+  loading: boolean;
+  error: string | null;
+}) {
+  const isKnown = companies.some((c) => c.id === value);
+  const placeholder = loading
+    ? "Loading companies…"
+    : companies.length === 0
+      ? "No companies available"
+      : "Select a company…";
+
+  return (
+    <>
+      <Select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        disabled={loading && companies.length === 0}
+      >
+        <option value="">{placeholder}</option>
+        {companies.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name} ({c.id})
+          </option>
+        ))}
+        {/* Preserve a saved value that isn't (yet) in the fetched list. */}
+        {value && !isKnown && <option value={value}>{value}</option>}
+      </Select>
+      {error && (
+        <Hint>Couldn't load companies: {error}. Selection may be stale.</Hint>
+      )}
+    </>
+  );
+}
+
 type Tab = "createUser" | "createProject" | "viewer";
 
 function App() {
   const [tab, setTab] = useState<Tab>("createUser");
+
+  // --- Companies the reseller has access to (for the company dropdowns) ---
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companiesLoading, setCompaniesLoading] = useState(true);
+  const [companiesError, setCompaniesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setCompaniesLoading(true);
+      setCompaniesError(null);
+      try {
+        const response = await fetch("/scanifly/companies");
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          throw new Error(
+            body?.message ?? `Server responded with ${response.status}`,
+          );
+        }
+        const data: Company[] = await response.json();
+        if (!cancelled) setCompanies(data);
+      } catch (err) {
+        if (!cancelled) {
+          setCompaniesError(
+            err instanceof Error ? err.message : "An error occurred",
+          );
+        }
+      } finally {
+        if (!cancelled) setCompaniesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // --- 3D viewer form state ---
   const [email, setEmail] = usePersistedString("scanifly_viewer_email");
@@ -631,14 +721,14 @@ function App() {
               </FieldGroup>
 
               <FieldGroup>
-                <Label htmlFor="companyId">Company ID</Label>
-                <Input
+                <Label htmlFor="companyId">Company</Label>
+                <CompanySelect
                   id="companyId"
-                  type="text"
-                  placeholder="Scanifly company ID to add the user to"
                   value={companyId}
-                  onChange={(e) => setCompanyId(e.target.value)}
-                  required
+                  onChange={setCompanyId}
+                  companies={companies}
+                  loading={companiesLoading}
+                  error={companiesError}
                 />
               </FieldGroup>
 
@@ -740,14 +830,14 @@ function App() {
               </FieldGroup>
 
               <FieldGroup>
-                <Label htmlFor="cpdCompanyId">Company ID</Label>
-                <Input
+                <Label htmlFor="cpdCompanyId">Company</Label>
+                <CompanySelect
                   id="cpdCompanyId"
-                  type="text"
-                  placeholder="Scanifly company ID that owns the project"
                   value={cpdCompanyId}
-                  onChange={(e) => setCpdCompanyId(e.target.value)}
-                  required
+                  onChange={setCpdCompanyId}
+                  companies={companies}
+                  loading={companiesLoading}
+                  error={companiesError}
                 />
               </FieldGroup>
 

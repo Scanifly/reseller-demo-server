@@ -150,6 +150,22 @@ type CompanyForReseller = {
   name: string;
 };
 
+/**
+ * The companies this reseller may act on (its own company plus any that have
+ * authorized it), returned to the client to populate the company dropdown.
+ */
+type ListResellerCompaniesResponse = CompanyForReseller[];
+
+/**
+ * Shape of a single page from Scanifly's paginated
+ * `GET /api/v1/reseller/companies` endpoint.
+ */
+type PaginatedResellerCompaniesResponse = {
+  items: CompanyForReseller[];
+  totalCount: number;
+  pageIndex?: number;
+};
+
 type Get3dEmbedRequest = {
   scaniflyDesignId: string;
   email: string;
@@ -307,6 +323,9 @@ type UpdateJwksEndpointRequest = {
 export type {
   AddCompanyToScaniflyRequest,
   AddCompanyToScaniflyResponse,
+  CompanyForReseller,
+  ListResellerCompaniesResponse,
+  PaginatedResellerCompaniesResponse,
   AddDesignToScaniflyRequest,
   AddDesignToScaniflyResponse,
   AddModuleLibraryToScaniflyRequest,

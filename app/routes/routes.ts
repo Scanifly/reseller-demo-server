@@ -17,6 +17,16 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"scaniflyProjectId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyDesignId":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CompanyForReseller": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ListResellerCompaniesResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"refAlias","ref":"CompanyForReseller"},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddCompanyToScaniflyResponse": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"companyId":{"dataType":"string","required":true}},"validators":{}},
@@ -97,11 +107,6 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"permissions":{"dataType":"array","array":{"dataType":"refEnum","ref":"Permission"}},"roles":{"dataType":"array","array":{"dataType":"refEnum","ref":"Role"}},"companyId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"phone":{"dataType":"string","required":true},"position":{"ref":"Position","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "CompanyForReseller": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ResellerType": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isActive":{"dataType":"boolean","required":true},"name":{"dataType":"string","required":true},"getJwtVerificationKeyEndpoint":{"dataType":"string","required":true},"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"company":{"ref":"CompanyForReseller","required":true},"authorizedCompanies":{"dataType":"array","array":{"dataType":"refAlias","ref":"CompanyForReseller"},"required":true},"id":{"dataType":"string","required":true}},"validators":{}},
@@ -154,6 +159,36 @@ export function RegisterRoutes(app: Router) {
                 next,
                 validatedArgs,
                 successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsScaniflyController_listCompanies: Record<string, TsoaRoute.ParameterSchema> = {
+                validationErrorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+        };
+        app.get('/scanifly/companies',
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController)),
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController.prototype.listCompanies)),
+
+            async function ScaniflyController_listCompanies(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsScaniflyController_listCompanies, request, response });
+
+                const controller = new ScaniflyController();
+
+              await templateService.apiHandler({
+                methodName: 'listCompanies',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
               });
             } catch (err) {
                 return next(err);

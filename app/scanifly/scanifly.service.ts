@@ -10,6 +10,8 @@ import {
   AddProjectToScaniflyResponse,
   AddUserToScaniflyRequest,
   AddUserToScaniflyResponse,
+  ListResellerCompaniesResponse,
+  PaginatedResellerCompaniesResponse,
   CreateDesignBody,
   CreateModuleLibraryBody,
   CreateProjectBody,
@@ -84,6 +86,53 @@ class ScaniflyService {
           `HTTP request failed with status code ${err.response?.status} ${err.response?.data?.message}`,
         );
         throw new Error(err.response?.data.message);
+      }
+      throw err;
+    }
+  }
+
+  /**
+   * List the companies this reseller can create users/projects for (its own
+   * company plus any that have authorized it). Used by the client to populate
+   * the company dropdown. Hits the reseller-admin endpoint with the API key,
+   * paging through the results until they are all collected.
+   */
+  async listCompanies(): Promise<ListResellerCompaniesResponse> {
+    try {
+      const companies: ListResellerCompaniesResponse = [];
+      const size = 100;
+      let pageIndex = 1;
+
+      // The endpoint is paginated; keep requesting pages until we've gathered
+      // every company the reseller has access to.
+      for (;;) {
+        const result = await axios.request<PaginatedResellerCompaniesResponse>({
+          url: `${this.#scaniflyUrl}/api/v1/reseller/companies`,
+          method: "GET",
+          headers: this.#apiKeyHeaders(),
+          params: { pageIndex, size },
+        });
+
+        companies.push(...result.data.items);
+
+        if (
+          result.data.items.length === 0 ||
+          companies.length >= result.data.totalCount
+        ) {
+          break;
+        }
+        pageIndex += 1;
+      }
+
+      return companies;
+    } catch (err: any) {
+      if (err instanceof AxiosError) {
+        console.error(
+          `HTTP request failed with status code ${err.response?.status} ${err.response?.data?.message}`,
+        );
+        throw new Error(
+          err.response?.data.message ?? err.response?.statusText ?? err.message,
+        );
       }
       throw err;
     }
