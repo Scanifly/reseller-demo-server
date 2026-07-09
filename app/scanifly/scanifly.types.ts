@@ -128,6 +128,17 @@ type AddUserToScaniflyRequest = {
   phone: string;
   email: string;
   companyId: string;
+  /**
+   * Optional. Overrides the roles derived from `position`.
+   * Only `admin` and `default` may be assigned by a reseller.
+   * Omit to default to `[default]`.
+   */
+  roles?: Role[];
+  /**
+   * Optional. Overrides the permissions derived from `position`.
+   * Omit to inherit the position's default permissions.
+   */
+  permissions?: Permission[];
 };
 
 type AddUserToScaniflyResponse = {
@@ -137,6 +148,22 @@ type AddUserToScaniflyResponse = {
 type CompanyForReseller = {
   id: string;
   name: string;
+};
+
+/**
+ * The companies this reseller may act on (its own company plus any that have
+ * authorized it), returned to the client to populate the company dropdown.
+ */
+type ListResellerCompaniesResponse = CompanyForReseller[];
+
+/**
+ * Shape of a single page from Scanifly's paginated
+ * `GET /api/v1/reseller/companies` endpoint.
+ */
+type PaginatedResellerCompaniesResponse = {
+  items: CompanyForReseller[];
+  totalCount: number;
+  pageIndex?: number;
 };
 
 type Get3dEmbedRequest = {
@@ -177,16 +204,6 @@ type ResellerType = {
   getJwtVerificationKeyEndpoint: string;
   name: string;
   isActive: boolean;
-};
-
-type ScaniflyAuthenticationRequest = {
-  email: string;
-  password: string;
-};
-
-type ScaniflyAuthenticationResponse = {
-  accessToken: string;
-  refreshToken: string;
 };
 
 type ScaniflyModule = {
@@ -306,6 +323,9 @@ type UpdateJwksEndpointRequest = {
 export type {
   AddCompanyToScaniflyRequest,
   AddCompanyToScaniflyResponse,
+  CompanyForReseller,
+  ListResellerCompaniesResponse,
+  PaginatedResellerCompaniesResponse,
   AddDesignToScaniflyRequest,
   AddDesignToScaniflyResponse,
   AddModuleLibraryToScaniflyRequest,
@@ -323,8 +343,6 @@ export type {
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   ResellerType,
-  ScaniflyAuthenticationRequest,
-  ScaniflyAuthenticationResponse,
   ScaniflyUser,
   UpdateJwksEndpointRequest,
 };

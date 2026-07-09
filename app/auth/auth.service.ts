@@ -23,7 +23,7 @@ class AuthService {
 
     const token = jsonwebtoken.sign(
       {
-        iss: "http://your-domain.com",
+        iss: this.#configService.getJwtIssuer(),
         aud: "scanifly",
         /**
          * You can either provide us the user ID in Scanifly or the user's email for us to look them up
@@ -44,7 +44,7 @@ class AuthService {
       this.#configService.getPrivateKey(),
       {
         algorithm: "RS256", // The `alg` field in your JWKS must be RS256
-        expiresIn: "24h",
+        expiresIn: "1h",
         keyid: this.#configService.getKeyId(), // Matches the `kid` in your JWKS
       },
     );

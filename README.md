@@ -1,5 +1,9 @@
 ## Scanifly Reseller Demo Server
 
+> **For local development and evaluation only.**
+>
+> This server has **no authentication** on any of its endpoints. Every API route — including user creation, credit purchases, JWT signing, and JWKS endpoint registration — is open to any caller that can reach the server. Before adapting this code for a real deployment you must add authentication middleware that verifies every incoming request comes from your own application.
+
 This is a NodeJS/Express HTTP server that will allow you to quickly test the Scanifly reseller APIs and see how to get your JWKS setup to be able to sign JWT's that Scanifly can then validate and use to authenticate your users into it's system.
 
 ## Setup & Running Locally
@@ -33,7 +37,9 @@ Take the public key and put it in the `/app/jwks.json` file inside the `keys` ar
 
 Place your key ID in the `JWKS_KEY_ID` field in the .env
 
-The `SCANIFLY_EMAIL` and `SCANIFLY_PASSWORD` values in your .env must be the `admin` of your Scanifly account so that in can interact with the reseller APIs.
+The `SCANIFLY_API_KEY` value in your .env must be an API key belonging to an `admin` user of your Scanifly reseller account. This key is sent as the `x-api-token` header and authenticates the reseller API calls (create company/user, purchase credits, update JWKS endpoint) against the `/api/v1` endpoints. Generate the key in the Scanifly portal, or ask Scanifly to provision one for you.
+
+> Project and design creation, and the 3D embed itself, are authenticated with the RS256 JWT that this server signs on your behalf (see JWKS setup below) — not the API key.
 
 ### Running Locally
 
@@ -74,7 +80,7 @@ Assuming you have a paid account and have a static domain on ngrok.
 
 On Mac you serve this demo server via that endpoint:
 ```bash
-ngrok http --url=your_ngrok_domain 3001
+ngrok http --url=your_ngrok_domain 3002
 ```
 
 Once you have your HTTPS URL you need to tell Scanifly to use that endpoint to validate your JWTs.
@@ -106,5 +112,49 @@ Each position has different permissions that control what actions can be perform
 | Designer                                |        ✅        |      ✅      |       ✅       |
 | Sales Rep                               |        ✅        |      ✅      |       ❌       |
 | Surveyor / Field Tech                   |        ✅        |      ❌      |       ❌       |
+
+#### Overriding the position defaults
+
+`position` still sets the user's **default** role and permissions. To create users
+whose access does not match a position preset — most commonly a company **admin** —
+the create-user request (`POST /scanifly/user`) accepts two optional fields that
+override those defaults:
+
+| Field | Type | Effect |
+| --- | --- | --- |
+| `roles` | `string[]` | Replaces the default role. Resellers may assign only `admin` or `default`. Omit to default to `default`. |
+| `permissions` | `string[]` | Replaces the position's default permissions entirely. Omit to inherit the position defaults. |
+
+Both fields are **optional** and independent — you can override the role, the
+permissions, or both. When a field is omitted the position-derived default is used,
+so existing integrations are unaffected.
+
+**Create an admin** by sending `roles: ["admin"]` (typically alongside the
+`adminTools` permission):
+
+```jsonc
+POST /scanifly/user
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "phone": "+1 555 123 4567",
+  "companyId": "<scanifly company id>",
+  "position": "executiveOwnerCEO",
+  "roles": ["admin"],
+  "permissions": ["adminTools", "billing", "upload", "watt3d"]
+}
+```
+
+Assignable `permissions` values: `adminTools`, `billing`, `upload` (create new
+projects), `download`, `uploadMedia`, `watt3d`, `simpleDesign`,
+`simpleDesignTechnical`, `viewMyProjects`, `editCompanyModuleLibrary`,
+`proposalManage`, `proposalCreate`, `proposalViewOnly`, `proposalTemplateManage`,
+`removeMediaCategories`. The deprecated `salesManager` and `mobile` permissions are
+rejected.
+
+> These fields are surfaced in the demo client under the **Create User** tab — the
+> position dropdown sets the defaults, and the optional role dropdown and permission
+> checkboxes apply the overrides above.
 
 ---

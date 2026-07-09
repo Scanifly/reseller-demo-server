@@ -44,12 +44,16 @@ class ConfigService {
     return process.env["SCANIFLY_ENDPOINT"]!;
   }
 
-  getScaniflyEmail() {
-    return process.env["SCANIFLY_EMAIL"]!;
+  getApiKey() {
+    return process.env["SCANIFLY_API_KEY"]!;
   }
 
-  getScaniflyPassword() {
-    return process.env["SCANIFLY_PASSWORD"]!;
+  getCorsOrigin() {
+    return process.env["CORS_ORIGIN"]!;
+  }
+
+  getJwtIssuer() {
+    return process.env["JWT_ISSUER"]!;
   }
 }
 

@@ -1,10 +1,11 @@
-PORT=3001
+PORT=3002
 
 SCANIFLY_ENDPOINT="https://api.portal.scanifly.com"
 
-SCANIFLY_EMAIL=your_scanifly_email
-
-SCANIFLY_PASSWORD=your_scanifly_password
+# API key for an admin user of your reseller company. Generate one in the Scanifly
+# portal (or ask Scanifly to provision it) and paste it here. Sent as the
+# `x-api-token` header on every /api/v1 reseller request.
+SCANIFLY_API_KEY=your_scanifly_api_key
 
 SCANIFLY_3D_URL="https://3d.scanifly.com"
 
@@ -13,3 +14,9 @@ JWKS_KEY_ID=must_match_the_kid_field_in_your_jwks_json_file
 JWKS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
 your_jwks_private_key_in_PEM_format
 -----END PRIVATE KEY-----"
+
+# Must match the origin your frontend runs on. Controls which domains can call this server.
+CORS_ORIGIN=http://localhost:5173
+
+# Included as the `iss` claim in every signed JWT. Use your own domain (must be HTTPS in production).
+JWT_ISSUER=http://localhost:3001

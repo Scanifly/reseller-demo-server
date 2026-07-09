@@ -30,6 +30,28 @@
 				],
 				"type": "object"
 			},
+			"CompanyForReseller": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"ListResellerCompaniesResponse": {
+				"items": {
+					"$ref": "#/components/schemas/CompanyForReseller"
+				},
+				"type": "array",
+				"description": "The companies this reseller may act on (its own company plus any that have\nauthorized it), returned to the client to populate the company dropdown."
+			},
 			"AddCompanyToScaniflyResponse": {
 				"properties": {
 					"companyId": {
@@ -474,15 +496,63 @@
 				"enum": [
 					"designer",
 					"surveyor",
+					"financeProcurement",
 					"salesMarketing",
 					"operationsProjectManager",
+					"installer",
+					"executiveOwnerCEO",
+					"thirdPartyEngineer",
 					"dronePilot",
-					"executiveOwnerCEO"
+					"maintenanceTech",
+					"guest"
+				],
+				"type": "string"
+			},
+			"Role": {
+				"description": "Roles a reseller is allowed to assign to a user.\nScanifly's `/api/v1/reseller/user` endpoint only permits `admin` and `default`.",
+				"enum": [
+					"admin",
+					"default"
+				],
+				"type": "string"
+			},
+			"Permission": {
+				"description": "Permissions a reseller is allowed to assign to a user.\nMirrors the allow-list enforced by Scanifly's `/api/v1/reseller/user` endpoint,\nwhich accepts every permission except the deprecated `salesManager` and `mobile`.",
+				"enum": [
+					"adminTools",
+					"billing",
+					"upload",
+					"download",
+					"uploadMedia",
+					"watt3d",
+					"simpleDesign",
+					"simpleDesignTechnical",
+					"viewMyProjects",
+					"editCompanyModuleLibrary",
+					"proposalManage",
+					"proposalCreate",
+					"proposalViewOnly",
+					"proposalTemplateManage",
+					"removeMediaCategories"
 				],
 				"type": "string"
 			},
 			"AddUserToScaniflyRequest": {
 				"properties": {
+					"permissions": {
+						"items": {
+							"$ref": "#/components/schemas/Permission"
+						},
+						"type": "array",
+						"description": "Optional. Overrides the permissions derived from `position`.\nOmit to inherit the position's default permissions."
+					},
+					"roles": {
+						"items": {
+							"$ref": "#/components/schemas/Role"
+						},
+						"type": "array",
+						"description": "Optional. Overrides the roles derived from `position`.\nOnly `admin` and `default` may be assigned by a reseller.\nOmit to default to `[default]`."
+					},
 					"companyId": {
 						"type": "string"
 					},
@@ -510,21 +580,6 @@
 					"position",
 					"lastName",
 					"firstName"
-				],
-				"type": "object"
-			},
-			"CompanyForReseller": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"id": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name",
-					"id"
 				],
 				"type": "object"
 			},
@@ -643,6 +698,47 @@
 						}
 					}
 				}
+			}
+		},
+		"/scanifly/companies": {
+			"get": {
+				"operationId": "ListCompanies",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ListResellerCompaniesResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "List the companies this reseller can create users/projects/designs for\n(its own company plus any that have authorized it).\nUsed by the client to populate the company dropdown.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/scanifly/company": {

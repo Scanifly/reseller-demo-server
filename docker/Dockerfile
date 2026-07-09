@@ -26,5 +26,5 @@ RUN yarn build:prod
 # Runtime stage: api
 FROM base AS api
 USER node
-EXPOSE 3001
+EXPOSE 3002
 CMD ["node", ".yarn/releases/yarn-3.6.4.cjs", "start"]

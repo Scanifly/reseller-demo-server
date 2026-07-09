@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Patch,
   Post,
   Res,
@@ -12,6 +13,7 @@ import {
 import {
   AddCompanyToScaniflyRequest,
   AddCompanyToScaniflyResponse,
+  ListResellerCompaniesResponse,
   AddDesignToScaniflyRequest,
   AddDesignToScaniflyResponse,
   AddModuleLibraryToScaniflyRequest,
@@ -51,6 +53,26 @@ class ScaniflyController extends Controller {
   ): Promise<string> {
     try {
       const result = await this.#scaniflyService.get3dEmbed(requestBody);
+      return result;
+    } catch (err: any) {
+      console.error(err);
+      return validationErrorResponse(400, { message: err.message });
+    }
+  }
+
+  /**
+   * List the companies this reseller can create users/projects/designs for
+   * (its own company plus any that have authorized it).
+   * Used by the client to populate the company dropdown.
+   * @returns array of `{ id, name }` companies the reseller has access to
+   */
+  @SuccessResponse("200", "OK")
+  @Get("/companies")
+  public async listCompanies(
+    @Res() validationErrorResponse: TsoaResponse<400, { message: string }>,
+  ): Promise<ListResellerCompaniesResponse> {
+    try {
+      const result = await this.#scaniflyService.listCompanies();
       return result;
     } catch (err: any) {
       console.error(err);

@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import cors from "cors";
 import { RegisterRoutes, rootRouter } from "./routes";
 import { ConfigService } from "./config";
 import path from "path";
@@ -26,6 +27,7 @@ class Server {
       await configService.init();
       const app = express();
 
+      app.use(cors({ origin: configService.getCorsOrigin() }));
       app.use(express.json());
       app.use(express.urlencoded({ extended: true }));
 
