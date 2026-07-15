@@ -44,12 +44,8 @@ class ConfigService {
     return process.env["SCANIFLY_ENDPOINT"]!;
   }
 
-  getScaniflyEmail() {
-    return process.env["SCANIFLY_EMAIL"]!;
-  }
-
-  getScaniflyPassword() {
-    return process.env["SCANIFLY_PASSWORD"]!;
+  getScaniflyApiKey() {
+    return process.env["SCANIFLY_API_KEY"]!;
   }
 }
 

@@ -1,4 +1,3 @@
-import moment from "moment";
 import Config from "../config/config.service";
 import {
   AddCompanyToScaniflyRequest,
@@ -20,13 +19,10 @@ import {
   PurchaseCreditsInScaniflyResponse,
   PurchaseCreditsResponse,
   ResellerType,
-  ScaniflyAuthenticationRequest,
-  ScaniflyAuthenticationResponse,
   ScaniflyUser,
   UpdateJwksEndpointRequest,
 } from "./scanifly.types";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import { ConfigService } from "../config";
 import { AuthService } from "../auth";
 
@@ -34,27 +30,20 @@ class ScaniflyService {
   // eslint-disable-next-line no-use-before-define
   static #instance: ScaniflyService;
 
-  #accessToken: string = "";
-
   #authService: AuthService;
 
   #configService: ConfigService;
 
-  #refreshToken: string = "";
+  #scaniflyApiKey: string = "";
 
   #scaniflyCompanyId: string = "";
-
-  #scaniflyEmail: string = "";
-
-  #scaniflyPassword: string = "";
 
   #scaniflyUrl: string = "";
 
   private constructor() {
     this.#authService = new AuthService();
     this.#configService = Config.GetInstance();
-    this.#scaniflyEmail = this.#configService.getScaniflyEmail();
-    this.#scaniflyPassword = this.#configService.getScaniflyPassword();
+    this.#scaniflyApiKey = this.#configService.getScaniflyApiKey();
     this.#scaniflyUrl = this.#configService.getScaniflyEndpoint();
   }
 
@@ -63,68 +52,6 @@ class ScaniflyService {
       ScaniflyService.#instance = new ScaniflyService();
     }
     return ScaniflyService.#instance;
-  }
-
-  async getAuthToken() {
-    if (this.#accessToken.length) {
-      const decoded = jsonwebtoken.decode(this.#accessToken, {
-        complete: true,
-      });
-      if (
-        !decoded ||
-        !decoded.payload ||
-        !(decoded.payload! as JwtPayload).exp
-      ) {
-        throw new Error("Could not decode Scanifly access token");
-      }
-
-      const expirationDate = new Date(
-        (decoded.payload as JwtPayload).exp! * 1000,
-      );
-
-      const remainingSeconds = moment(expirationDate).diff(
-        moment(new Date()),
-        "seconds",
-      );
-
-      if (remainingSeconds <= 120) {
-        // Refresh token if less than 2 minutes left
-        const result = await axios.request<
-          ScaniflyAuthenticationResponse,
-          AxiosResponse<ScaniflyAuthenticationResponse>,
-          {}
-        >({
-          url: `${this.#scaniflyUrl}/auth/token/refresh`,
-          method: "POST",
-          headers: {
-            "Authorization-refresh": this.#refreshToken,
-          },
-        });
-
-        this.#accessToken = result.data.accessToken;
-        this.#refreshToken = result.data.refreshToken;
-      }
-
-      return this.#accessToken;
-    }
-
-    const result = await axios.request<
-      ScaniflyAuthenticationResponse,
-      AxiosResponse<ScaniflyAuthenticationResponse>,
-      ScaniflyAuthenticationRequest
-    >({
-      url: `${this.#scaniflyUrl}/auth/login`,
-      method: "POST",
-      data: {
-        email: this.#scaniflyEmail,
-        password: this.#scaniflyPassword,
-      },
-    });
-
-    this.#accessToken = result.data.accessToken;
-    this.#refreshToken = result.data.refreshToken;
-
-    return this.#accessToken;
   }
 
   /**
@@ -140,10 +67,10 @@ class ScaniflyService {
         AxiosResponse<AddCompanyToScaniflyResponse>,
         AddCompanyToScaniflyRequest
       >({
-        url: `${this.#scaniflyUrl}/reseller/company`,
+        url: `${this.#scaniflyUrl}/api/v1/reseller/company`,
         method: "POST",
         headers: {
-          Authorization: `Bearer ${await this.getAuthToken()}`,
+          "x-api-token": this.#scaniflyApiKey,
         },
         data,
       });
@@ -320,10 +247,10 @@ class ScaniflyService {
         AxiosResponse<AddUserToScaniflyResponse>,
         AddUserToScaniflyRequest
       >({
-        url: `${this.#scaniflyUrl}/reseller/user`,
+        url: `${this.#scaniflyUrl}/api/v1/reseller/user`,
         method: "POST",
         headers: {
-          Authorization: `Bearer ${await this.getAuthToken()}`,
+          "x-api-token": this.#scaniflyApiKey,
         },
         data,
       });
@@ -371,7 +298,7 @@ class ScaniflyService {
   }
 
   /**
-   * Uses the scanifly email and password from your .env to retrieve your company ID
+   * Uses the Scanifly API key from your .env to retrieve your company ID
    */
   async getScaniflyCompanyId() {
     if (!this.#scaniflyCompanyId.length) {
@@ -379,10 +306,10 @@ class ScaniflyService {
         ScaniflyUser,
         AxiosResponse<ScaniflyUser>
       >({
-        url: `${this.#scaniflyUrl}/users/current`,
+        url: `${this.#scaniflyUrl}/api/v1/users/current`,
         method: "GET",
         headers: {
-          Authorization: `Bearer ${await this.getAuthToken()}`,
+          "x-api-token": this.#scaniflyApiKey,
         },
       });
       this.#scaniflyCompanyId = result.data.companyId;
@@ -413,22 +340,20 @@ class ScaniflyService {
    * @note This requires a company ID to exist in Scanifly to purchase the credits for
    * @returns updated balance
    */
-  async purchaseCredits(
-    {
-      scaniflyCompanyId,
-      ...rest
-    }: PurchaseCreditsInScaniflyRequest,
-  ): Promise<PurchaseCreditsInScaniflyResponse> {
+  async purchaseCredits({
+    scaniflyCompanyId,
+    ...rest
+  }: PurchaseCreditsInScaniflyRequest): Promise<PurchaseCreditsInScaniflyResponse> {
     try {
       const result = await axios.request<
         PurchaseCreditsResponse,
         AxiosResponse<PurchaseCreditsResponse>,
         PurchaseCreditsBody
       >({
-        url: `${this.#scaniflyUrl}/reseller/subscription/credits`,
+        url: `${this.#scaniflyUrl}/api/v1/reseller/subscription/credits`,
         method: "POST",
         headers: {
-          Authorization: `Bearer ${await this.getAuthToken()}`,
+          "x-api-token": this.#scaniflyApiKey,
         },
         data: {
           ...rest,
@@ -437,7 +362,7 @@ class ScaniflyService {
       });
       return {
         totalBalance: result.data.amount,
-      }
+      };
     } catch (err: any) {
       if (err instanceof AxiosError) {
         console.error(
@@ -463,10 +388,10 @@ class ScaniflyService {
         AxiosResponse<ResellerType>,
         UpdateJwksEndpointRequest
       >({
-        url: `${this.#scaniflyUrl}/reseller`,
+        url: `${this.#scaniflyUrl}/api/v1/reseller`,
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${await this.getAuthToken()}`,
+          "x-api-token": this.#scaniflyApiKey,
         },
         data,
       });
