@@ -33,7 +33,21 @@ Take the public key and put it in the `/app/jwks.json` file inside the `keys` ar
 
 Place your key ID in the `JWKS_KEY_ID` field in the .env
 
-The `SCANIFLY_EMAIL` and `SCANIFLY_PASSWORD` values in your .env must be the `admin` of your Scanifly account so that in can interact with the reseller APIs.
+The `SCANIFLY_API_KEY` value in your .env must be an API key created by an `admin` of your Scanifly reseller account so that it can interact with the reseller APIs. See [Getting a Scanifly API Key](#getting-a-scanifly-api-key) below.
+
+### Getting a Scanifly API Key
+
+This server authenticates to Scanifly with an API key instead of an email/password login. The key acts on behalf of the admin user who created it.
+
+1. Log in to the [Scanifly portal](https://portal.scanifly.com) as an **admin** of your reseller company (only admins can manage access tokens).
+2. Open **Account → Access Tokens** (or go directly to `https://portal.scanifly.com/account/access-tokens`).
+3. Create a new token: give it a recognizable name (e.g. `reseller-demo-server`) and optionally an expiration date.
+4. Copy the token when it is displayed and store it somewhere safe — treat it like a password.
+5. Paste it into the `SCANIFLY_API_KEY` field in your `.env`.
+
+The server sends the key in the `x-api-token` header. API keys are only accepted on `/api/v1/*` endpoints, which this server already uses for all admin-level calls. User-scoped calls (e.g. creating designs) continue to use JWTs signed by your JWKS private key and are unaffected.
+
+If a request fails with `401 Unauthorized`, the key may have expired or been revoked — generate a new one from the same Access Tokens page.
 
 ### Running Locally
 
