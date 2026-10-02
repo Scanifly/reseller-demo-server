@@ -76,7 +76,13 @@ function App() {
           />
         )}
 
-        {tab === "viewer" && <ViewerTab />}
+        {tab === "viewer" && (
+          <ViewerTab
+            companies={companies}
+            companiesLoading={companiesLoading}
+            companiesError={companiesError}
+          />
+        )}
       </Container>
     </>
   );

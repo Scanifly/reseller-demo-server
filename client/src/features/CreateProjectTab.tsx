@@ -99,6 +99,7 @@ export function CreateProjectTab({
     seedPersisted(STORAGE_KEYS.viewer.projectId, createdProjectId);
     seedPersisted(STORAGE_KEYS.viewer.designId, createdDesignId);
     seedPersisted(STORAGE_KEYS.viewer.userId, cpdUserId);
+    seedPersisted(STORAGE_KEYS.viewer.company, cpdCompanyId);
     onNavigate("viewer");
   };
 

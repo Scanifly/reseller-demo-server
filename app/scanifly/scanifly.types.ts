@@ -166,6 +166,41 @@ type PaginatedResellerCompaniesResponse = {
   pageIndex?: number;
 };
 
+/**
+ * Details Scanifly uses when it has to create the user on the fly the first time a
+ * reseller-signed JWT names an email it does not recognise ("optimistic user creation").
+ *
+ * Optimistic creation only happens when the target company has granted your reseller the
+ * `autoCreateUsers` permission, and it needs `scaniflyCompanyId` alongside these fields to
+ * know which company to create the user in. Every field below is optional and falls back
+ * to a Scanifly default.
+ *
+ * None of these values update a user who already exists — they are only read at creation.
+ */
+type OptimisticUserClaims = {
+  /**
+   * Defaults to "not provided"
+   */
+  firstName?: string;
+  /**
+   * Defaults to "not provided"
+   */
+  lastName?: string;
+  /**
+   * Defaults to "1234567890"
+   */
+  phone?: string;
+  /**
+   * Recorded on the created user. Defaults to `designer`, as does any value Scanifly does
+   * not recognise.
+   *
+   * @note Unlike `POST /scanifly/user`, this does NOT drive the user's permissions.
+   * An optimistically created user always gets the `default` role and the
+   * `simpleDesignTechnical` permission, whatever position is sent.
+   */
+  position?: Position;
+};
+
 type Get3dEmbedRequest = {
   scaniflyDesignId: string;
   email: string;
@@ -174,6 +209,17 @@ type Get3dEmbedRequest = {
    * Only required if the email in your system does not match the user's email in Scanifly
    */
   scaniflyUserId?: string;
+  /**
+   * The Scanifly company the user being authenticated belongs to.
+   * Required for Scanifly to create the user on the fly if they do not exist yet
+   * (see `OptimisticUserClaims`). Harmless when the user already exists.
+   */
+  scaniflyCompanyId?: string;
+  /**
+   * Details used only if Scanifly has to create the user on the fly.
+   * Ignored when the user already exists.
+   */
+  newUser?: OptimisticUserClaims;
 };
 
 type PurchaseCreditsBody = {
@@ -338,6 +384,7 @@ export type {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
+  OptimisticUserClaims,
   PurchaseCreditsBody,
   PurchaseCreditsResponse,
   PurchaseCreditsInScaniflyRequest,

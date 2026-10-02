@@ -9,6 +9,11 @@ export const STORAGE_KEYS = {
     projectId: "scanifly_viewer_project_id",
     designId: "scanifly_viewer_design_id",
     userId: "scanifly_viewer_user_id",
+    company: "scanifly_viewer_company",
+    firstName: "scanifly_viewer_first",
+    lastName: "scanifly_viewer_last",
+    phone: "scanifly_viewer_phone",
+    position: "scanifly_viewer_position",
   },
   createUser: {
     firstName: "scanifly_cu_first",

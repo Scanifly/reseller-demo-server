@@ -44,6 +44,10 @@ class ScaniflyController extends Controller {
    * Retrieve a URL to the Scanifly 3D embed to render in an iFrame.
    * Passing in the `email` and `scaniflyUserId` will allow the user to be authenticated into Scanifly.
    * Assuming that the user was created by your reseller or has authorized your reseller
+   *
+   * Also pass `scaniflyCompanyId` (and optionally `newUser`) so Scanifly can create the
+   * user on the fly if they do not exist yet, rather than rejecting the token. This only
+   * happens when the company has granted your reseller the `autoCreateUsers` permission.
    */
   @SuccessResponse("201", "Created")
   @Post("/3dUrl")

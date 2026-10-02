@@ -95,6 +95,7 @@ export function CreateUserTab({
     if (!createdUserId) return;
     seedPersisted(STORAGE_KEYS.viewer.email, cuEmail);
     seedPersisted(STORAGE_KEYS.viewer.userId, createdUserId);
+    seedPersisted(STORAGE_KEYS.viewer.company, companyId);
     onNavigate("viewer");
   };
 

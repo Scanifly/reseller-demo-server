@@ -7,8 +7,54 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Position": {
+				"enum": [
+					"designer",
+					"surveyor",
+					"financeProcurement",
+					"salesMarketing",
+					"operationsProjectManager",
+					"installer",
+					"executiveOwnerCEO",
+					"thirdPartyEngineer",
+					"dronePilot",
+					"maintenanceTech",
+					"guest"
+				],
+				"type": "string"
+			},
+			"OptimisticUserClaims": {
+				"properties": {
+					"position": {
+						"$ref": "#/components/schemas/Position",
+						"description": "Recorded on the created user. Defaults to `designer`, as does any value Scanifly does\nnot recognise."
+					},
+					"phone": {
+						"type": "string",
+						"description": "Defaults to \"1234567890\""
+					},
+					"lastName": {
+						"type": "string",
+						"description": "Defaults to \"not provided\""
+					},
+					"firstName": {
+						"type": "string",
+						"description": "Defaults to \"not provided\""
+					}
+				},
+				"type": "object",
+				"description": "Details Scanifly uses when it has to create the user on the fly the first time a\nreseller-signed JWT names an email it does not recognise (\"optimistic user creation\").\n\nOptimistic creation only happens when the target company has granted your reseller the\n`autoCreateUsers` permission, and it needs `scaniflyCompanyId` alongside these fields to\nknow which company to create the user in. Every field below is optional and falls back\nto a Scanifly default.\n\nNone of these values update a user who already exists — they are only read at creation."
+			},
 			"Get3dEmbedRequest": {
 				"properties": {
+					"newUser": {
+						"$ref": "#/components/schemas/OptimisticUserClaims",
+						"description": "Details used only if Scanifly has to create the user on the fly.\nIgnored when the user already exists."
+					},
+					"scaniflyCompanyId": {
+						"type": "string",
+						"description": "The Scanifly company the user being authenticated belongs to.\nRequired for Scanifly to create the user on the fly if they do not exist yet\n(see `OptimisticUserClaims`). Harmless when the user already exists."
+					},
 					"scaniflyUserId": {
 						"type": "string",
 						"description": "Only required if the email in your system does not match the user's email in Scanifly"
@@ -492,22 +538,6 @@
 				],
 				"type": "object"
 			},
-			"Position": {
-				"enum": [
-					"designer",
-					"surveyor",
-					"financeProcurement",
-					"salesMarketing",
-					"operationsProjectManager",
-					"installer",
-					"executiveOwnerCEO",
-					"thirdPartyEngineer",
-					"dronePilot",
-					"maintenanceTech",
-					"guest"
-				],
-				"type": "string"
-			},
 			"Role": {
 				"description": "Roles a reseller is allowed to assign to a user.\nScanifly's `/api/v1/reseller/user` endpoint only permits `admin` and `default`.",
 				"enum": [
@@ -682,7 +712,7 @@
 						}
 					}
 				},
-				"description": "Retrieve a URL to the Scanifly 3D embed to render in an iFrame.\nPassing in the `email` and `scaniflyUserId` will allow the user to be authenticated into Scanifly.\nAssuming that the user was created by your reseller or has authorized your reseller",
+				"description": "Retrieve a URL to the Scanifly 3D embed to render in an iFrame.\nPassing in the `email` and `scaniflyUserId` will allow the user to be authenticated into Scanifly.\nAssuming that the user was created by your reseller or has authorized your reseller\n\nAlso pass `scaniflyCompanyId` (and optionally `newUser`) so Scanifly can create the\nuser on the fly if they do not exist yet, rather than rejecting the token. This only\nhappens when the company has granted your reseller the `autoCreateUsers` permission.",
 				"tags": [
 					"Scanifly"
 				],

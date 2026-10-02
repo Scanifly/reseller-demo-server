@@ -12,9 +12,19 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "Position": {
+        "dataType": "refEnum",
+        "enums": ["designer","surveyor","financeProcurement","salesMarketing","operationsProjectManager","installer","executiveOwnerCEO","thirdPartyEngineer","dronePilot","maintenanceTech","guest"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OptimisticUserClaims": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"position":{"ref":"Position"},"phone":{"dataType":"string"},"lastName":{"dataType":"string"},"firstName":{"dataType":"string"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Get3dEmbedRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"scaniflyProjectId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyDesignId":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"newUser":{"ref":"OptimisticUserClaims"},"scaniflyCompanyId":{"dataType":"string"},"scaniflyUserId":{"dataType":"string"},"scaniflyProjectId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyDesignId":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CompanyForReseller": {
@@ -85,11 +95,6 @@ const models: TsoaRoute.Models = {
     "AddUserToScaniflyResponse": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userId":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Position": {
-        "dataType": "refEnum",
-        "enums": ["designer","surveyor","financeProcurement","salesMarketing","operationsProjectManager","installer","executiveOwnerCEO","thirdPartyEngineer","dronePilot","maintenanceTech","guest"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Role": {

@@ -99,6 +99,69 @@ If the user already has a companyId and userId you can skip to step 3.
 4. Create a design in Scanifly to associate with the project
 5. Get a 3D URL
 
+### Optimistic User Creation
+
+Step 2 above is optional if the company has granted your reseller the
+`autoCreateUsers` permission. With that permission in place, Scanifly creates the
+user the first time a reseller-signed JWT names an email it does not recognise,
+instead of rejecting the token — so a user who exists only in your system can be
+sent straight to a 3D URL.
+
+To make that possible the JWT this server signs carries extra claims:
+
+| Claim | Required | Meaning |
+| --- | --- | --- |
+| `sub` | yes | The user's email. Already sent today. |
+| `iss_scanifly_company_id` | yes | **Your reseller** company ID. Already sent today. |
+| `sub_scanifly_company_id` | yes, to create | The **target** company the user belongs to — not your reseller company. Without it an unknown user is still rejected. |
+| `firstName` | no | Defaults to `not provided` |
+| `lastName` | no | Defaults to `not provided` |
+| `phone` | no | Defaults to `1234567890` |
+| `position` | no | Defaults to `designer`; an unrecognised value also falls back to `designer` |
+
+All four optional claims are read **only at creation**. They never update a user
+who already exists, so sending them is safe on every request.
+
+`sub_scanifly_user_id`, when you send it, must be a Scanifly ObjectId or be
+omitted entirely — a malformed value rejects the token before creation is
+considered.
+
+A user created this way always gets the `default` role and the
+`simpleDesignTechnical` permission, whatever `position` you send. `position` is
+recorded on the user but grants nothing here. To choose roles and permissions up
+front, create the user with `POST /scanifly/user` instead (see
+[Permissions and Roles](#permissions-and-roles)).
+
+The three endpoints that sign a JWT on a user's behalf pass the target company
+through for you:
+
+- `POST /scanifly/3dUrl` — send `scaniflyCompanyId`, plus an optional `newUser`
+  object carrying any of `firstName`, `lastName`, `phone`, `position`:
+
+  ```jsonc
+  POST /scanifly/3dUrl
+  {
+    "email": "jane@example.com",
+    "scaniflyProjectId": "<project id>",
+    "scaniflyDesignId": "<design id>",
+    "scaniflyCompanyId": "<target company id>",
+    "newUser": {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "phone": "+1 555 123 4567",
+      "position": "designer"
+    }
+  }
+  ```
+
+- `POST /scanifly/project` and `POST /scanifly/design` — the `scaniflyCompanyId`
+  they already take is sent as `sub_scanifly_company_id`, so creating a project
+  for an unknown user provisions that user with the defaults above.
+
+> These fields are surfaced in the demo client under the **3D Viewer** tab — the
+> company dropdown sets the target company, and the optional "New user details"
+> section fills in the remaining claims.
+
 ### Permissions and Roles
 
 When creating a user there is a field in the request body named `position`.

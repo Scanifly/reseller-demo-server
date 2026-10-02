@@ -63,12 +63,25 @@ All major backend services use a singleton pattern:
 
 ### Request Flow (3D viewer embed)
 
-1. Frontend POSTs `{ email, projectId, designId, userId? }` to `POST /scanifly/3dUrl`
+1. Frontend POSTs `{ email, scaniflyProjectId, scaniflyDesignId, scaniflyCompanyId, scaniflyUserId?, newUser? }` to `POST /scanifly/3dUrl`
 2. Controller calls `ScaniflyService.get3dEmbed()`, which constructs the base embed URL locally from `SCANIFLY_3D_URL` and the project/design IDs
-3. `AuthService` signs a JWT (`iss`, `aud: "scanifly"`, `sub: email`, `iss_scanifly_company_id`, 1h expiry)
+3. `AuthService` signs a JWT (`iss`, `aud: "scanifly"`, `sub: email`, `iss_scanifly_company_id`, 1h expiry) plus the optimistic-creation claims below
 4. The signed JWT is appended as a query param to the embed URL
 5. Frontend renders the URL in an `<iframe>`
 6. Scanifly validates the JWT by fetching the public JWKS from `/.well-known/jwks.json`
+
+### Optimistic User Creation
+
+`AuthService.getJwt()` takes two extra arguments beyond the reseller's own company ID:
+
+- `companyIdInScaniflyForUser` → the `sub_scanifly_company_id` claim. This is the **target** company of the user being authenticated, distinct from `iss_scanifly_company_id` (the reseller's own company). Scanifly needs it to create a user it cannot resolve from `sub_scanifly_user_id` or `sub`.
+- `newUser` (`OptimisticUserClaims`) → the `firstName` / `lastName` / `phone` / `position` claims, each optional with a Scanifly-side default. Read only at creation; ignored for an existing user.
+
+Creation only happens when the target company has granted the reseller the `autoCreateUsers` permission; otherwise an unknown user is rejected exactly as before, so sending the claims is always safe.
+
+Three call sites pass the target company: `get3dEmbed` (from the request body, with `newUser`), and `addProject` / `addDesign` (reusing the `scaniflyCompanyId` they already take). `addModuleLibrary` has no company in its request and does not.
+
+User-facing detail lives in the README's "Optimistic User Creation" section; keep the two in sync.
 
 ### TSOA Route Generation
 

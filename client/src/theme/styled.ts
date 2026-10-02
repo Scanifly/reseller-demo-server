@@ -80,8 +80,16 @@ export const Label = styled.label`
 `;
 
 export const Hint = styled.span`
+  font-size: 0.85rem;
   font-weight: 400;
+  line-height: 1.45;
   color: #9ca3af;
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.95em;
+    color: #6b7280;
+  }
 `;
 
 const inputStyles = `
@@ -194,6 +202,25 @@ export const SuccessMessage = styled.div`
     padding: 2px 6px;
     border-radius: 4px;
   }
+`;
+
+/**
+ * Groups a set of fields under a rule and a heading, used to separate a form's
+ * optional section from the fields above it.
+ */
+export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+`;
+
+export const SectionTitle = styled.p`
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
 `;
 
 export const IframeWrapper = styled.div`

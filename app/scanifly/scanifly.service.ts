@@ -149,11 +149,14 @@ class ScaniflyService {
     name,
   }: AddDesignToScaniflyRequest): Promise<AddDesignToScaniflyResponse> {
     try {
-      // Get an access token for the user we want to "create the design" as
+      // Get an access token for the user we want to "create the design" as.
+      // `companyIdInScaniflyForUser` lets Scanifly create that user on the fly if they
+      // do not exist yet and the company allows it.
       const scaniflyAccessToken = await this.#authService.getJwt({
         emailInYourSystem: email,
         userIdInScanifly: scaniflyUserId,
         yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+        companyIdInScaniflyForUser: scaniflyCompanyId,
       });
 
       const result = await axios.request<
@@ -247,11 +250,14 @@ class ScaniflyService {
     ...rest
   }: AddProjectToScaniflyRequest): Promise<AddProjectToScaniflyResponse> {
     try {
-      // Get an access token for the user we want to "create the project" as
+      // Get an access token for the user we want to "create the project" as.
+      // `companyIdInScaniflyForUser` lets Scanifly create that user on the fly if they
+      // do not exist yet and the company allows it.
       const scaniflyAccessToken = await this.#authService.getJwt({
         emailInYourSystem: email,
         userIdInScanifly: scaniflyUserId,
         yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+        companyIdInScaniflyForUser: scaniflyCompanyId,
       });
 
       const result = await axios.request<
@@ -327,17 +333,23 @@ class ScaniflyService {
     scaniflyProjectId,
     scaniflyDesignId,
     scaniflyUserId,
+    scaniflyCompanyId,
+    newUser,
   }: Get3dEmbedRequest): Promise<string> {
     const scanifly3dUrl = this.#configService.getScanifly3dUrl();
 
     let iFrameUrl = `${scanifly3dUrl}/?ID=${scaniflyProjectId}&did=${scaniflyDesignId}`;
 
     if (email) {
-      // Get an access token for the user we want to "create the project" as
+      // Get an access token for the user we want to view the design as.
+      // `companyIdInScaniflyForUser` and `newUser` are what let Scanifly create that user
+      // on the fly the first time they open the viewer, instead of rejecting the token.
       const scaniflyAccessToken = await this.#authService.getJwt({
         emailInYourSystem: email,
         userIdInScanifly: scaniflyUserId,
         yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+        companyIdInScaniflyForUser: scaniflyCompanyId,
+        newUser,
       });
       iFrameUrl += `&token=${scaniflyAccessToken}`;
     } else {
