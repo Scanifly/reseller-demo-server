@@ -30,6 +30,43 @@
 				],
 				"type": "object"
 			},
+			"GetDesignSettingsEmbedResponse": {
+				"properties": {
+					"expiresAt": {
+						"type": "string",
+						"description": "When `token` stops being accepted (ISO 8601)"
+					},
+					"token": {
+						"type": "string",
+						"description": "Post this to the iframe in a `scanifly:embed-auth` message once the iframe posts\n`scanifly:embed-ready`. Never put it in the URL."
+					},
+					"embedUrl": {
+						"type": "string",
+						"description": "Set this as the iframe `src`. It carries no secret."
+					}
+				},
+				"required": [
+					"expiresAt",
+					"token",
+					"embedUrl"
+				],
+				"type": "object"
+			},
+			"GetDesignSettingsEmbedRequest": {
+				"properties": {
+					"scaniflyUserId": {
+						"type": "string",
+						"description": "Only required if the email in your system does not match the user's email in Scanifly"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object"
+			},
 			"AddCompanyToScaniflyResponse": {
 				"properties": {
 					"companyId": {
@@ -639,6 +676,57 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/Get3dEmbedRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/scanifly/design-settings-embed": {
+			"post": {
+				"operationId": "GetDesignSettingsEmbed",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetDesignSettingsEmbedResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get what your page needs to embed a user's Scanifly 3D design settings in an iFrame:\nthe iFrame URL, and a JWT to hand to the iFrame over postMessage.\nSee the working page at `GET /demo/design-settings`.\nThe user must belong to a company your reseller is authorized for.\nIn your own server, only mint this for the user who is signed in to your site.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetDesignSettingsEmbedRequest"
 							}
 						}
 					}

@@ -21,6 +21,8 @@ import {
   AddUserToScaniflyRequest,
   AddUserToScaniflyResponse,
   Get3dEmbedRequest,
+  GetDesignSettingsEmbedRequest,
+  GetDesignSettingsEmbedResponse,
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   ResellerType,
@@ -52,6 +54,27 @@ class ScaniflyController extends Controller {
     try {
       const result = await this.#scaniflyService.get3dEmbed(requestBody);
       return result;
+    } catch (err: any) {
+      console.error(err);
+      return validationErrorResponse(400, { message: err.message });
+    }
+  }
+
+  /**
+   * Get what your page needs to embed a user's Scanifly 3D design settings in an iFrame:
+   * the iFrame URL, and a JWT to hand to the iFrame over postMessage.
+   * See the working page at `GET /demo/design-settings`.
+   * The user must belong to a company your reseller is authorized for.
+   * In your own server, only mint this for the user who is signed in to your site.
+   */
+  @SuccessResponse("201", "Created")
+  @Post("/design-settings-embed")
+  public async getDesignSettingsEmbed(
+    @Body() requestBody: GetDesignSettingsEmbedRequest,
+    @Res() validationErrorResponse: TsoaResponse<400, { message: string }>,
+  ): Promise<GetDesignSettingsEmbedResponse> {
+    try {
+      return await this.#scaniflyService.getDesignSettingsEmbed(requestBody);
     } catch (err: any) {
       console.error(err);
       return validationErrorResponse(400, { message: err.message });

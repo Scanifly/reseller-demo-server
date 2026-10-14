@@ -14,6 +14,8 @@ import {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
+  GetDesignSettingsEmbedRequest,
+  GetDesignSettingsEmbedResponse,
   PurchaseCreditsBody,
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
@@ -23,6 +25,7 @@ import {
   UpdateJwksEndpointRequest,
 } from "./scanifly.types";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import jsonwebtoken from "jsonwebtoken";
 import { ConfigService } from "../config";
 import { AuthService } from "../auth";
 
@@ -295,6 +298,30 @@ class ScaniflyService {
     }
 
     return iFrameUrl;
+  }
+
+  /**
+   * Everything your page needs to show a user's Scanifly 3D design settings in an iframe.
+   * The token is handed to the iframe over postMessage rather than in the URL, so it stays
+   * out of browser history, server logs and referrer headers.
+   * @returns the iframe URL and a JWT for the user, to post to the iframe when it asks for it
+   */
+  async getDesignSettingsEmbed({
+    email,
+    scaniflyUserId,
+  }: GetDesignSettingsEmbedRequest): Promise<GetDesignSettingsEmbedResponse> {
+    const token = await this.#authService.getJwt({
+      emailInYourSystem: email,
+      userIdInScanifly: scaniflyUserId,
+      yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+    });
+    const { exp } = jsonwebtoken.decode(token) as { exp: number };
+
+    return {
+      embedUrl: `${this.#configService.getScaniflyPortalUrl()}/embed/design-settings`,
+      token,
+      expiresAt: new Date(exp * 1000).toISOString(),
+    };
   }
 
   /**

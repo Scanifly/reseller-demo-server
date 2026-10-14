@@ -32,7 +32,14 @@ class Server {
       // Server up public keys
       app.get("/.well-known/jwks.json", (_: Request, res: Response) => {
         res.type("application/json");
-        res.sendFile(path.resolve(__dirname, "jwks.json"));
+        res.sendFile("jwks.json", { root: __dirname });
+      });
+
+      // Demo partner page embedding the Scanifly 3D design settings
+      app.get("/demo/design-settings", (_: Request, res: Response) => {
+        res.sendFile("design-settings.html", {
+          root: path.resolve(__dirname, "public"),
+        });
       });
 
       RegisterRoutes(rootRouter);

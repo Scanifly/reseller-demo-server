@@ -17,6 +17,16 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"scaniflyProjectId":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyDesignId":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetDesignSettingsEmbedResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"expiresAt":{"dataType":"string","required":true},"token":{"dataType":"string","required":true},"embedUrl":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetDesignSettingsEmbedRequest": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"email":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddCompanyToScaniflyResponse": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"companyId":{"dataType":"string","required":true}},"validators":{}},
@@ -139,6 +149,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'get3dEmbed',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsScaniflyController_getDesignSettingsEmbed: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"GetDesignSettingsEmbedRequest"},
+                validationErrorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+        };
+        app.post('/scanifly/design-settings-embed',
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController)),
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController.prototype.getDesignSettingsEmbed)),
+
+            async function ScaniflyController_getDesignSettingsEmbed(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsScaniflyController_getDesignSettingsEmbed, request, response });
+
+                const controller = new ScaniflyController();
+
+              await templateService.apiHandler({
+                methodName: 'getDesignSettingsEmbed',
                 controller,
                 response,
                 next,

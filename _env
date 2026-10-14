@@ -6,6 +6,8 @@ SCANIFLY_API_KEY=your_scanifly_api_key
 
 SCANIFLY_3D_URL="https://3d.scanifly.com"
 
+SCANIFLY_PORTAL_URL="https://portal.scanifly.com"
+
 JWKS_KEY_ID=must_match_the_kid_field_in_your_jwks_json_file
 
 JWKS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----

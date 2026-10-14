@@ -5,7 +5,7 @@
   "scripts": {
     "jwks": "cp app/server/jwks.json ./dist/app/server/",
     "build": "./node_modules/typescript/bin/tsc --project ./tsconfig.json",
-    "build:prod": "cp app/jwks.json ./dist/app/jwks.json && cp package.json ./dist/package.json && cp yarn.lock ./dist/yarn.lock && cp -r .yarn ./dist/.yarn && cd ./dist && yarn workspaces focus --production",
+    "build:prod": "cp app/jwks.json ./dist/app/jwks.json && mkdir -p ./dist/app/public && cp -R app/public/. ./dist/app/public && cp package.json ./dist/package.json && cp yarn.lock ./dist/yarn.lock && cp -r .yarn ./dist/.yarn && cd ./dist && yarn workspaces focus --production",
     "lint": "./node_modules/typescript/bin/tsc && eslint .",
     "lint:fix": "./node_modules/typescript/bin/tsc && eslint --fix .",
     "local": "env nodemon ./app/index.ts",
