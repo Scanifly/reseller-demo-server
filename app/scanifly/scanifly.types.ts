@@ -149,6 +149,30 @@ type Get3dEmbedRequest = {
   scaniflyUserId?: string;
 };
 
+type GetDesignSettingsEmbedRequest = {
+  email: string;
+  /**
+   * Only required if the email in your system does not match the user's email in Scanifly
+   */
+  scaniflyUserId?: string;
+};
+
+type GetDesignSettingsEmbedResponse = {
+  /**
+   * Set this as the iframe `src`. It carries no secret.
+   */
+  embedUrl: string;
+  /**
+   * Post this to the iframe in a `scanifly:embed-auth` message once the iframe posts
+   * `scanifly:embed-ready`. Never put it in the URL.
+   */
+  token: string;
+  /**
+   * When `token` stops being accepted (ISO 8601)
+   */
+  expiresAt: string;
+};
+
 type PurchaseCreditsBody = {
   companyId: string;
   creditCount: number;
@@ -308,6 +332,8 @@ export type {
   CreateModuleLibraryBody,
   CreateProjectBody,
   Get3dEmbedRequest,
+  GetDesignSettingsEmbedRequest,
+  GetDesignSettingsEmbedResponse,
   PurchaseCreditsBody,
   PurchaseCreditsResponse,
   PurchaseCreditsInScaniflyRequest,

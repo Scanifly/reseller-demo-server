@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design settings embed demo</title>
+    <style>
+      :root {
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --text: #1d2330;
+        --muted: #5b6475;
+        --border: #dde1e8;
+        --accent: #1f6feb;
+        --in: #0a7a3e;
+        --out: #8250df;
+        --error: #c62828;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      header {
+        padding: 16px 24px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+      }
+      header h1 {
+        margin: 0;
+        font-size: 18px;
+      }
+      header p {
+        margin: 4px 0 0;
+        color: var(--muted);
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 16px;
+        padding: 16px 24px;
+      }
+      @media (max-width: 960px) {
+        main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      section {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        min-width: 0;
+      }
+      h2 {
+        margin: 0 0 12px;
+        font-size: 15px;
+      }
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: end;
+        margin-bottom: 16px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1 1 220px;
+      }
+      input {
+        font: inherit;
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+      button {
+        font: inherit;
+        padding: 7px 14px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      #embed {
+        min-height: 70vh;
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+      #embed iframe {
+        width: 100%;
+        height: 80vh;
+        border: 0;
+      }
+      #log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font:
+          12px/1.45 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+      #log li {
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        overflow-wrap: anywhere;
+      }
+      #log time {
+        color: var(--muted);
+        margin-right: 6px;
+      }
+      #log .in {
+        color: var(--in);
+      }
+      #log .out {
+        color: var(--out);
+      }
+      #log .error {
+        color: var(--error);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Your site: Scanifly 3D design settings</h1>
+      <p>
+        Opens <code>/embed/design-settings</code> in an iframe and signs the
+        user in over postMessage. The panel on the right shows each step as it
+        happens.
+      </p>
+    </header>
+    <main>
+      <section>
+        <form id="open-form">
+          <label>
+            User's email
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="designer@customer.com"
+            />
+          </label>
+          <label>
+            Scanifly user ID (optional)
+            <input
+              name="scaniflyUserId"
+              placeholder="Only if the email differs in Scanifly"
+            />
+          </label>
+          <button type="submit">Open design settings</button>
+        </form>
+        <div id="embed">Enter a user and open the design settings.</div>
+      </section>
+      <section>
+        <h2>Behind the scenes</h2>
+        <ol id="log"></ol>
+      </section>
+    </main>
+
+    <script>
+      /* ================================================================
+       * Integration code: this is the part to copy into your site.
+       *
+       * 1. Your server mints { embedUrl, token } for the signed-in user
+       *    (POST /scanifly/design-settings-embed in this demo server).
+       * 2. Listen for messages BEFORE the iframe starts loading.
+       * 3. Load embedUrl in the iframe. No token in the URL.
+       * 4. When the iframe posts { type: 'scanifly:embed-ready' }, reply with
+       *    { type: 'scanifly:embed-auth', token } to the Scanifly origin.
+       * ================================================================ */
+
+      const READY_MESSAGE = "scanifly:embed-ready";
+      const AUTH_MESSAGE = "scanifly:embed-auth";
+      // A READY after we already sent a token means the embed rejected it
+      // (expired, deactivated user, wrong environment...). Mint a fresh one,
+      // but don't loop forever on a user who can't be signed in.
+      const MAX_TOKENS_PER_MOUNT = 3;
+
+      /**
+       * Mounts the Scanifly design settings embed inside `container`.
+       * `getSession` calls your server and resolves to { embedUrl, token }
+       * for the signed-in user. Returns a function that unmounts the embed.
+       */
+      async function mountDesignSettings(
+        container,
+        getSession,
+        onEvent = () => {},
+      ) {
+        let session = await getSession();
+        const embedOrigin = new URL(session.embedUrl).origin;
+        const iframe = document.createElement("iframe");
+        iframe.title = "Scanifly design settings";
+        let tokensSent = 0;
+        let isMinting = false;
+
+        /** Answers the iframe's READY ping with a token, minting a new one if the last was rejected. */
+        async function handleMessage(event) {
+          // Only trust our own iframe, served from Scanifly's origin.
+          if (
+            event.source !== iframe.contentWindow ||
+            event.origin !== embedOrigin
+          ) {
+            return;
+          }
+          if (!event.data || event.data.type !== READY_MESSAGE) {
+            return;
+          }
+          onEvent("in", `${READY_MESSAGE} from ${event.origin}`);
+          // The embed repeats READY every second until it gets a token; one reply at a time.
+          if (isMinting) {
+            return;
+          }
+          if (tokensSent >= MAX_TOKENS_PER_MOUNT) {
+            onEvent(
+              "error",
+              "The embed keeps rejecting this user's token. Giving up.",
+            );
+            window.removeEventListener("message", handleMessage);
+            return;
+          }
+          if (tokensSent > 0) {
+            isMinting = true;
+            try {
+              session = await getSession();
+            } finally {
+              isMinting = false;
+            }
+          }
+          // targetOrigin pins the token to Scanifly: the browser drops it if the iframe navigated elsewhere.
+          iframe.contentWindow.postMessage(
+            { type: AUTH_MESSAGE, token: session.token },
+            embedOrigin,
+          );
+          tokensSent += 1;
+          onEvent(
+            "out",
+            `${AUTH_MESSAGE} to ${embedOrigin} (token ${tokensSent})`,
+          );
+        }
+
+        // Listen first: the embed may announce READY before the iframe's load event fires.
+        window.addEventListener("message", handleMessage);
+        iframe.src = session.embedUrl;
+        container.replaceChildren(iframe);
+        onEvent("info", `iframe src = ${session.embedUrl}`);
+
+        return () => {
+          window.removeEventListener("message", handleMessage);
+          iframe.remove();
+        };
+      }
+
+      /* ================================================================
+       * Demo page wiring (not needed in your site).
+       * ================================================================ */
+
+      const form = document.getElementById("open-form");
+      const embed = document.getElementById("embed");
+      const logList = document.getElementById("log");
+      let unmount = null;
+      let watchdogId = null;
+
+      /** Appends one line to the "Behind the scenes" panel. */
+      function log(kind, text) {
+        const item = document.createElement("li");
+        const time = document.createElement("time");
+        time.textContent = new Date().toLocaleTimeString();
+        const body = document.createElement("span");
+        body.className = kind;
+        body.textContent = ({ in: "← ", out: "→ " }[kind] || "") + text;
+        item.append(time, body);
+        logList.append(item);
+        item.scrollIntoView({ block: "nearest" });
+        if (kind === "in" && watchdogId) {
+          clearTimeout(watchdogId);
+          watchdogId = null;
+        }
+      }
+
+      /** Calls this demo server for an embed URL and a token for the user in the form. */
+      async function requestSession(email, scaniflyUserId) {
+        log("info", `POST /scanifly/design-settings-embed for ${email}`);
+        const response = await fetch("/scanifly/design-settings-embed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            ...(scaniflyUserId && { scaniflyUserId }),
+          }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(body.message || `HTTP ${response.status}`);
+        }
+        log(
+          "info",
+          `token minted, expires ${new Date(body.expiresAt).toLocaleString()}`,
+        );
+        return body;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const email = form.email.value.trim();
+        const scaniflyUserId = form.scaniflyUserId.value.trim();
+        const button = form.querySelector("button");
+
+        unmount?.();
+        clearTimeout(watchdogId);
+        logList.replaceChildren();
+        button.disabled = true;
+        try {
+          unmount = await mountDesignSettings(
+            embed,
+            () => requestSession(email, scaniflyUserId),
+            log,
+          );
+          // Flag an embed that never announces itself (wrong URL, framing blocked...).
+          watchdogId = setTimeout(() => {
+            log(
+              "error",
+              "No READY from the embed after 15 s. Check the iframe URL and that it loaded.",
+            );
+          }, 15000);
+        } catch (err) {
+          log("error", `Could not get a token: ${err.message}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      // Prefill from the URL, e.g. /demo/design-settings?email=designer@customer.com
+      const params = new URLSearchParams(window.location.search);
+      form.email.value = params.get("email") || "";
+      form.scaniflyUserId.value = params.get("scaniflyUserId") || "";
+    </script>
+  </body>
+</html>

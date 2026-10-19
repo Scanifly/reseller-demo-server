@@ -107,6 +107,40 @@ If the user already has a companyId and userId you can skip to step 3.
 4. Create a design in Scanifly to associate with the project
 5. Get a 3D URL
 
+### Embedding the 3D Design Settings
+
+Your users can edit their Scanifly 3D design settings (module library, setbacks, simulation defaults...) inside your site. Scanifly serves the page at `https://portal.scanifly.com/embed/design-settings`. You show it in an iframe and sign the user in with a JWT that your page sends to the iframe over `postMessage`. The token never goes in the URL, so it stays out of browser history, server logs and referrer headers.
+
+**See it working:** with this server running, open `http://localhost:3001/demo/design-settings`, enter the email of a user in a company your reseller is authorized for, and click **Open design settings**. The panel on the right logs each step. The integration code is the block at the top of the `<script>` in [`app/public/design-settings.html`](./app/public/design-settings.html). It is plain JavaScript with no dependencies, so you can copy it into any frontend.
+
+```
+Your page                      Your server                         Scanifly iframe
+─────────                      ───────────                         ───────────────
+POST /scanifly/design-settings-embed ──► sign a JWT for the user
+◄── { embedUrl, token, expiresAt }
+add a "message" listener
+<iframe src=embedUrl> ───────────────────────────────────────────► loads, no session
+◄──────────────────────────────────────────── { type: "scanifly:embed-ready" }
+postMessage({ type: "scanifly:embed-auth", token }, "https://portal.scanifly.com") ──►
+                                                                    signs in, shows the settings
+```
+
+What your page has to do:
+
+1. **Add the `message` listener before you set the iframe `src`.** The embed sends `scanifly:embed-ready` as soon as it starts, which can be before the iframe's `load` event fires.
+2. **Check who sent the message:** `event.source === iframe.contentWindow` and `event.origin === "https://portal.scanifly.com"`.
+3. **Reply with the Scanifly origin as `targetOrigin`**, never `"*"`. The browser then only delivers the token if the iframe is still on Scanifly.
+4. **Answer every `scanifly:embed-ready`.** The embed repeats it every second until it gets a token. If it sends another one after you have already replied, it rejected your token (expired, unknown user, wrong environment), so mint a new one. Stop after a few tries.
+
+Things to know:
+
+- **Only mint a token for the user who is signed in to your site.** Anyone holding the token can act as that user in Scanifly until it expires. This demo server has no login of its own, so don't expose it publicly.
+- **The user must be in a company your reseller is authorized for**, the same rule as the 3D viewer.
+- **Company-wide settings are only shown to admins.** Admin users are signed in as regular users unless your reseller's authorization for their company allows `authenticateAdmins`. Without it they only see their personal settings.
+- The token expires after 24 hours (see `AuthService.getJwt`), and there is no refresh token. Mint a new one each time you show the embed.
+- If the iframe shows "Unable to authenticate this embedded view.", Scanifly did not receive or accept a token within 15 seconds. Check that your JWKS endpoint is reachable (see [Configuring JWKS Validation](#configuring-jwks-validation)) and that the user's email exists in Scanifly.
+- Point `SCANIFLY_PORTAL_URL` in your `.env` at another environment if Scanifly gave you one. It must match the API that `SCANIFLY_ENDPOINT` points at.
+
 ### Permissions and Roles
 
 When creating a user there is a field in the request body named `position`.

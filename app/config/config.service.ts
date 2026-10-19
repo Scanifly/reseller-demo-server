@@ -40,6 +40,10 @@ class ConfigService {
     return process.env["SCANIFLY_3D_URL"]!;
   }
 
+  getScaniflyPortalUrl() {
+    return process.env["SCANIFLY_PORTAL_URL"] || "https://portal.scanifly.com";
+  }
+
   getScaniflyEndpoint() {
     return process.env["SCANIFLY_ENDPOINT"]!;
   }
