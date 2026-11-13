@@ -16,11 +16,16 @@ import {
   Get3dEmbedRequest,
   GetDesignSettingsEmbedRequest,
   GetDesignSettingsEmbedResponse,
+  ListDesignsInScaniflyRequest,
+  ListProjectsInScaniflyRequest,
+  ListProjectsInScaniflyResponse,
   PurchaseCreditsBody,
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   PurchaseCreditsResponse,
   ResellerType,
+  ScaniflyCompany,
+  ScaniflyDesign,
   ScaniflyUser,
   UpdateJwksEndpointRequest,
 } from "./scanifly.types";
@@ -95,7 +100,6 @@ class ScaniflyService {
   async addDesign({
     scaniflyUserId,
     email,
-    scaniflyCompanyId,
     scaniflyProjectId,
     name,
   }: AddDesignToScaniflyRequest): Promise<AddDesignToScaniflyResponse> {
@@ -112,13 +116,12 @@ class ScaniflyService {
         AxiosResponse<AddDesignToScaniflyResponse>,
         CreateDesignBody
       >({
-        url: `${this.#scaniflyUrl}/projects/designs`,
+        url: `${this.#scaniflyUrl}/api/v1/designs/${encodeURIComponent(scaniflyProjectId)}`,
         method: "POST",
         headers: {
           Authorization: `Bearer ${scaniflyAccessToken}`,
         },
         data: {
-          companyId: scaniflyCompanyId,
           projectId: scaniflyProjectId,
           name,
           remote: true,
@@ -156,7 +159,7 @@ class ScaniflyService {
 
       let userId = scaniflyUserId;
       if (!userId) {
-        userId = await this.getScaniflyUserId(scaniflyAccessToken);
+        userId = await this.getScaniflyUserId(scaniflyAccessToken, email);
       }
 
       const result = await axios.request<
@@ -164,7 +167,7 @@ class ScaniflyService {
         AxiosResponse<AddModuleLibraryToScaniflyResponse>,
         CreateModuleLibraryBody
       >({
-        url: `${this.#scaniflyUrl}/module-library`,
+        url: `${this.#scaniflyUrl}/api/v1/module-library`,
         method: "POST",
         headers: {
           Authorization: `Bearer ${scaniflyAccessToken}`,
@@ -193,7 +196,6 @@ class ScaniflyService {
    */
   async addProject({
     email,
-    scaniflyCompanyId,
     scaniflyUserId,
     ...rest
   }: AddProjectToScaniflyRequest): Promise<AddProjectToScaniflyResponse> {
@@ -210,16 +212,13 @@ class ScaniflyService {
         AxiosResponse<AddProjectToScaniflyResponse>,
         CreateProjectBody
       >({
-        url: `${this.#scaniflyUrl}/projects`,
+        url: `${this.#scaniflyUrl}/api/v1/projects`,
         method: "POST",
         headers: {
           Authorization: `Bearer ${scaniflyAccessToken}`,
         },
-        data: {
-          ...rest,
-          companyId: scaniflyCompanyId,
-          createdBy: email,
-        },
+        // Scanifly puts the project in the signed-in user's company and makes them its creator
+        data: rest,
       });
       return result.data;
     } catch (err: any) {
@@ -325,40 +324,111 @@ class ScaniflyService {
   }
 
   /**
-   * Uses the Scanifly API key from your .env to retrieve your company ID
+   * Uses the Scanifly API key from your .env to retrieve your reseller company's ID
    */
   async getScaniflyCompanyId() {
     if (!this.#scaniflyCompanyId.length) {
       const result = await axios.request<
-        ScaniflyUser,
-        AxiosResponse<ScaniflyUser>
+        ScaniflyCompany,
+        AxiosResponse<ScaniflyCompany>
       >({
-        url: `${this.#scaniflyUrl}/api/v1/users/current`,
+        url: `${this.#scaniflyUrl}/api/v1/companies/current`,
         method: "GET",
         headers: {
           "x-api-token": this.#scaniflyApiKey,
         },
       });
-      this.#scaniflyCompanyId = result.data.companyId;
+      this.#scaniflyCompanyId = result.data.id;
     }
     return this.#scaniflyCompanyId;
   }
 
   /**
-   * Uses the Scanifly access token passed in to get the users ID
+   * Looks up a user's Scanifly ID by email among the members of their own company,
+   * using the access token signed for that user.
    */
-  async getScaniflyUserId(scaniflyAccessToken: string) {
+  async getScaniflyUserId(scaniflyAccessToken: string, email: string) {
     const result = await axios.request<
-      ScaniflyUser,
-      AxiosResponse<ScaniflyUser>
+      ScaniflyUser[],
+      AxiosResponse<ScaniflyUser[]>
     >({
-      url: `${this.#scaniflyUrl}/users/current`,
+      url: `${this.#scaniflyUrl}/api/v1/companies/current/members`,
       method: "GET",
       headers: {
         Authorization: `Bearer ${scaniflyAccessToken}`,
       },
     });
-    return result.data.id;
+    const member = result.data.find(
+      (user) => user.email.toLowerCase() === email.toLowerCase(),
+    );
+    if (!member) {
+      throw new Error(`No Scanifly user with email ${email} in their company`);
+    }
+    return member.id;
+  }
+
+  /**
+   * Lists the designs on a project, as the given user
+   */
+  async listDesigns({
+    email,
+    scaniflyUserId,
+    scaniflyProjectId,
+  }: ListDesignsInScaniflyRequest): Promise<ScaniflyDesign[]> {
+    try {
+      const scaniflyAccessToken = await this.#authService.getJwt({
+        emailInYourSystem: email,
+        userIdInScanifly: scaniflyUserId,
+        yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+      });
+
+      const result = await axios.request<
+        ScaniflyDesign[],
+        AxiosResponse<ScaniflyDesign[]>
+      >({
+        url: `${this.#scaniflyUrl}/api/v1/designs/${encodeURIComponent(scaniflyProjectId)}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${scaniflyAccessToken}`,
+        },
+      });
+      return result.data;
+    } catch (err: any) {
+      ScaniflyService.#rethrow(err);
+    }
+  }
+
+  /**
+   * Lists the projects in the user's company that the user can see, newest first
+   */
+  async listProjects({
+    email,
+    scaniflyUserId,
+    pageIndex = 1,
+    size = 25,
+  }: ListProjectsInScaniflyRequest): Promise<ListProjectsInScaniflyResponse> {
+    try {
+      const scaniflyAccessToken = await this.#authService.getJwt({
+        emailInYourSystem: email,
+        userIdInScanifly: scaniflyUserId,
+        yourScaniflyCompanyId: await this.getScaniflyCompanyId(),
+      });
+
+      const result = await axios.request<
+        ListProjectsInScaniflyResponse,
+        AxiosResponse<ListProjectsInScaniflyResponse>
+      >({
+        url: `${this.#scaniflyUrl}/api/v1/projects`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${scaniflyAccessToken}`,
+        },
+        params: { pageIndex, size },
+      });
+      return result.data;
+    } catch (err: any) {
+      ScaniflyService.#rethrow(err);
+    }
   }
 
   /**
@@ -434,6 +504,21 @@ class ScaniflyService {
       }
       throw err;
     }
+  }
+
+  /**
+   * Logs a failed Scanifly request and rethrows it with Scanifly's error message
+   */
+  static #rethrow(err: unknown): never {
+    if (err instanceof AxiosError) {
+      console.error(
+        `HTTP request failed with status code ${err.response?.status} ${err.response?.data?.message}`,
+      );
+      throw new Error(
+        err.response?.data?.message ?? err.response?.statusText ?? err.message,
+      );
+    }
+    throw err;
   }
 }
 

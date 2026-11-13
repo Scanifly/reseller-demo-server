@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acme Solar CRM</title>
+    <style>
+      :root {
+        --bg: #f4f5f7;
+        --panel: #ffffff;
+        --panel-2: #f9fafb;
+        --text: #18202f;
+        --muted: #5d6676;
+        --border: #e1e4ea;
+        --brand: #e8590c;
+        --brand-ink: #ffffff;
+        --brand-soft: #fff1e8;
+        --accent: #1f6feb;
+        --ok: #0a7a3e;
+        --error: #c62828;
+        --scanifly: #6941c6;
+        --scanifly-soft: #f3efff;
+        --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+        --radius: 10px;
+        --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1218;
+          --panel: #171b23;
+          --panel-2: #1c212b;
+          --text: #e7eaf0;
+          --muted: #9aa3b2;
+          --border: #2a303c;
+          --brand: #ff7a33;
+          --brand-ink: #1a0d05;
+          --brand-soft: #2b1a10;
+          --accent: #5b9dff;
+          --ok: #3fbf7f;
+          --error: #ff6b6b;
+          --scanifly: #a48afb;
+          --scanifly-soft: #231c3a;
+          --shadow: none;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font:
+          14px/1.5 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      button,
+      input {
+        font: inherit;
+        color: inherit;
+      }
+      a {
+        color: var(--accent);
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+
+      /* ---------- shell ---------- */
+      .app {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        grid-template-rows: 56px minmax(0, 1fr);
+        height: 100%;
+      }
+      .topbar {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 15px;
+        white-space: nowrap;
+      }
+      .logo-mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: var(--brand);
+        color: var(--brand-ink);
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 4px 6px 4px 4px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--panel-2);
+        cursor: pointer;
+      }
+      .avatar {
+        width: 26px;
+        height: 26px;
+        flex: none;
+        border-radius: 50%;
+        background: var(--brand-soft);
+        color: var(--brand);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .user-chip span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 220px;
+      }
+      .sidebar {
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        padding: 12px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        color: var(--muted);
+      }
+      .nav-item:hover {
+        background: var(--panel-2);
+        color: var(--text);
+      }
+      .nav-item[aria-current="page"] {
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-weight: 600;
+      }
+      .nav-item.fake {
+        cursor: default;
+        opacity: 0.55;
+      }
+      .nav-item.fake:hover {
+        background: none;
+        color: var(--muted);
+      }
+      .nav-label {
+        margin: 14px 10px 4px;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .powered {
+        margin-left: 6px;
+        font-size: 10px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: var(--scanifly-soft);
+        color: var(--scanifly);
+        font-weight: 600;
+      }
+      main {
+        overflow: auto;
+        padding: 20px 24px 40px;
+      }
+      @media (max-width: 760px) {
+        .app {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: 56px auto minmax(0, 1fr);
+        }
+        .sidebar {
+          flex-direction: row;
+          overflow-x: auto;
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+          padding: 6px 8px;
+        }
+        .nav-item {
+          width: auto;
+          white-space: nowrap;
+        }
+        .nav-label,
+        .nav-item.fake {
+          display: none;
+        }
+        main {
+          padding: 16px;
+        }
+        .user-chip span {
+          max-width: 110px;
+        }
+        .logo-text-long {
+          display: none;
+        }
+      }
+
+      /* ---------- common bits ---------- */
+      .page-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .page-head h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .page-head p {
+        margin: 2px 0 0;
+        color: var(--muted);
+      }
+      .crumb {
+        border: 0;
+        background: none;
+        padding: 0;
+        color: var(--accent);
+        cursor: pointer;
+        margin-bottom: 6px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        background: var(--panel-2);
+      }
+      .btn.primary {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: var(--brand-ink);
+        font-weight: 600;
+      }
+      .btn.primary:hover {
+        filter: brightness(1.05);
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .empty,
+      .error-box {
+        padding: 32px 16px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .error-box {
+        color: var(--error);
+      }
+      .badge {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        border-top-color: var(--brand);
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        vertical-align: -3px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ---------- projects ---------- */
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table th,
+      .table td {
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .table th {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--panel-2);
+      }
+      .table tr:last-child td {
+        border-bottom: 0;
+      }
+      .table tbody tr {
+        cursor: pointer;
+      }
+      .table tbody tr:hover td {
+        background: var(--panel-2);
+      }
+      .table .name {
+        font-weight: 600;
+      }
+      @media (max-width: 760px) {
+        .table .hide-sm {
+          display: none;
+        }
+      }
+
+      /* ---------- project detail ---------- */
+      .project-layout {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 1000px) {
+        .project-layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      .designs {
+        padding: 8px;
+        align-self: start;
+      }
+      .designs h2,
+      .viewer-head h2 {
+        margin: 4px 8px 8px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .design-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: none;
+        cursor: pointer;
+      }
+      .design-item:hover {
+        background: var(--panel-2);
+      }
+      .design-item[aria-current="true"] {
+        border-color: var(--brand);
+        background: var(--brand-soft);
+      }
+      .design-item small {
+        display: block;
+        color: var(--muted);
+      }
+      .viewer {
+        display: flex;
+        flex-direction: column;
+        min-height: 520px;
+        overflow: hidden;
+      }
+      .viewer-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+      .viewer-head h2 {
+        margin: 0;
+      }
+      .viewer-body {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        min-height: 480px;
+        background: var(--panel-2);
+      }
+      .viewer-body iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 70vh;
+        border: 0;
+        display: block;
+      }
+      .embed-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--scanifly);
+      }
+      .embed-tag::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--scanifly);
+      }
+      .viewer.embedded {
+        outline: 2px dashed var(--scanifly);
+        outline-offset: 3px;
+      }
+
+      /* ---------- dialog ---------- */
+      dialog {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0;
+        width: min(460px, calc(100vw - 32px));
+        background: var(--panel);
+        color: var(--text);
+        box-shadow: 0 20px 40px rgb(0 0 0 / 25%);
+      }
+      dialog::backdrop {
+        background: rgb(15 18 24 / 45%);
+      }
+      dialog form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      }
+      dialog h2 {
+        margin: 0;
+        font-size: 17px;
+      }
+      dialog p {
+        margin: 0;
+        color: var(--muted);
+      }
+      label.field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      label.check {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 13px;
+      }
+      .field input {
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--text);
+      }
+      .field input:focus {
+        outline: 2px solid var(--brand);
+        outline-offset: -1px;
+      }
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 4px;
+      }
+      .form-error {
+        color: var(--error);
+        font-size: 13px;
+        min-height: 1em;
+      }
+
+      /* ---------- API drawer ---------- */
+      .drawer-toggle {
+        border-color: var(--scanifly);
+        color: var(--scanifly);
+      }
+      .drawer-toggle .count {
+        min-width: 18px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: var(--scanifly);
+        color: #fff;
+        font-size: 11px;
+        text-align: center;
+      }
+      .drawer {
+        position: fixed;
+        top: 56px;
+        right: 0;
+        bottom: 0;
+        width: min(460px, 100vw);
+        background: var(--panel);
+        border-left: 1px solid var(--border);
+        transform: translateX(100%);
+        visibility: hidden;
+        transition:
+          transform 0.18s ease,
+          visibility 0s linear 0.18s;
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+      }
+      .drawer.open {
+        transform: none;
+        visibility: visible;
+        box-shadow: -8px 0 24px rgb(0 0 0 / 10%);
+        transition: transform 0.18s ease;
+      }
+      .drawer header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .drawer header h2 {
+        margin: 0;
+        font-size: 14px;
+      }
+      .drawer header p {
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .calls {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        flex: 1;
+      }
+      .calls li {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+      }
+      .call-line {
+        display: flex;
+        gap: 6px;
+        align-items: baseline;
+        font-family: var(--mono);
+        overflow-wrap: anywhere;
+      }
+      .call-line .method {
+        font-weight: 700;
+        min-width: 42px;
+      }
+      .call-line .status {
+        margin-left: auto;
+        white-space: nowrap;
+      }
+      .status.ok {
+        color: var(--ok);
+      }
+      .status.fail {
+        color: var(--error);
+      }
+      .call-line.upstream {
+        color: var(--scanifly);
+        padding-left: 12px;
+      }
+      .call-line.upstream::before {
+        content: "↳";
+        margin-right: 2px;
+      }
+      .call-note {
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .call-note.event-in {
+        color: var(--ok);
+      }
+      .call-note.event-out {
+        color: var(--scanifly);
+      }
+      .call-note.event-error {
+        color: var(--error);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="logo">
+          <div class="logo-mark" aria-hidden="true">☀</div>
+          <span>Acme Solar <span class="logo-text-long">CRM</span></span>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn drawer-toggle" id="drawer-toggle" type="button">
+          API calls <span class="count" id="call-count">0</span>
+        </button>
+        <button
+          class="user-chip"
+          id="user-chip"
+          type="button"
+          title="Switch user"
+          hidden
+        >
+          <div class="avatar" id="user-avatar"></div>
+          <span id="user-email"></span>
+        </button>
+      </header>
+
+      <nav class="sidebar" aria-label="Main">
+        <button class="nav-item fake" type="button" tabindex="-1">
+          ◎ Dashboard
+        </button>
+        <button class="nav-item fake" type="button" tabindex="-1">
+          ☺ Leads
+        </button>
+        <button class="nav-item" type="button" data-nav="projects">
+          ⌂ Projects <span class="powered">Scanifly</span>
+        </button>
+        <button class="nav-item fake" type="button" tabindex="-1">
+          ✉ Proposals
+        </button>
+        <div class="nav-label">Settings</div>
+        <button class="nav-item" type="button" data-nav="settings">
+          ⚙ Design settings <span class="powered">Scanifly</span>
+        </button>
+      </nav>
+
+      <main id="view" tabindex="-1"></main>
+    </div>
+
+    <aside class="drawer" id="drawer" aria-label="API calls">
+      <header>
+        <h2>Behind the scenes</h2>
+        <p>
+          Each call this page makes to the demo server, and the documented
+          Scanifly <code>/api/v1</code> route it uses. Purple is Scanifly.
+        </p>
+      </header>
+      <ol class="calls" id="calls"></ol>
+    </aside>
+
+    <dialog id="signin-dialog">
+      <form method="dialog" id="signin-form">
+        <h2>Sign in to Acme Solar CRM</h2>
+        <p>
+          Pretend to be one of your users. The demo server signs a JWT for this
+          email with your JWKS key, and Scanifly signs them in with it.
+        </p>
+        <label class="field">
+          Email
+          <input
+            name="email"
+            type="email"
+            required
+            autocomplete="off"
+            placeholder="designer@customer.com"
+          />
+        </label>
+        <label class="field">
+          Scanifly user ID (optional)
+          <input
+            name="scaniflyUserId"
+            autocomplete="off"
+            placeholder="Only if the email differs in Scanifly"
+          />
+        </label>
+        <div class="dialog-actions">
+          <button class="btn primary" type="submit">Continue</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="project-dialog">
+      <form method="dialog" id="project-form">
+        <h2>New project</h2>
+        <p>Creates the project in the user's Scanifly company.</p>
+        <label class="field">
+          Customer name
+          <input name="name" required placeholder="Jordan Rivera" />
+        </label>
+        <label class="field">
+          Address
+          <input
+            name="address"
+            required
+            placeholder="1600 Pennsylvania Ave NW, Washington, DC 20500"
+          />
+        </label>
+        <label class="check">
+          <input name="withDesign" type="checkbox" checked />
+          Also create a first design
+        </label>
+        <div class="form-error" id="project-error"></div>
+        <div class="dialog-actions">
+          <button class="btn" value="cancel" formnovalidate>Cancel</button>
+          <button class="btn primary" type="submit" value="create">
+            Create project
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="design-dialog">
+      <form method="dialog" id="design-form">
+        <h2>New design</h2>
+        <label class="field">
+          Design name
+          <input name="name" required placeholder="Option B – south roof" />
+        </label>
+        <div class="form-error" id="design-error"></div>
+        <div class="dialog-actions">
+          <button class="btn" value="cancel" formnovalidate>Cancel</button>
+          <button class="btn primary" type="submit" value="create">
+            Create design
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      /* ================================================================
+       * Acme Solar CRM is a pretend partner app. It shows how a reseller's
+       * own product could look with Scanifly embedded in it.
+       *
+       * The browser only ever talks to the demo server (/scanifly/*). The
+       * demo server signs a JWT for the user and calls Scanifly's
+       * documented /api/v1 routes with it. In your product, take the user
+       * from your own session on the server, not from the browser.
+       * ================================================================ */
+
+      const STORAGE_KEY = "acme-crm-user";
+
+      /**
+       * The Scanifly routes behind each demo server route, for the API drawer.
+       * Every user-scoped call first resolves your reseller company ID with
+       * GET /api/v1/companies/current (API key), once, then caches it.
+       */
+      const UPSTREAM = [
+        [/^GET \/scanifly\/projects$/, ["GET /api/v1/projects"]],
+        [
+          /^GET \/scanifly\/projects\/[^/]+\/designs$/,
+          ["GET /api/v1/designs/{projectId}"],
+        ],
+        [/^POST \/scanifly\/project$/, ["POST /api/v1/projects"]],
+        [/^POST \/scanifly\/design$/, ["POST /api/v1/designs/{projectId}"]],
+        [/^POST \/scanifly\/3dUrl$/, []],
+        [/^POST \/scanifly\/design-settings-embed$/, []],
+      ];
+
+      const state = {
+        user: null,
+        route: { name: "projects" },
+        callCount: 0,
+      };
+
+      const view = document.getElementById("view");
+      const callsList = document.getElementById("calls");
+      const drawer = document.getElementById("drawer");
+      let teardownView = () => {};
+
+      /* ---------------- tiny DOM helper ---------------- */
+
+      /**
+       * Creates an element. `props` are set as properties (or attributes for
+       * aria-/data- names); children may be nodes, strings, or falsy to skip.
+       * Text is always set as text, never parsed as HTML.
+       */
+      function h(tag, props = {}, ...children) {
+        const el = document.createElement(tag);
+        for (const [key, value] of Object.entries(props)) {
+          if (value === undefined || value === null || value === false) {
+            continue;
+          }
+          if (key.startsWith("aria-") || key.startsWith("data-")) {
+            el.setAttribute(key, value);
+          } else if (key.startsWith("on")) {
+            el.addEventListener(key.slice(2), value);
+          } else {
+            el[key] = value;
+          }
+        }
+        for (const child of children.flat()) {
+          if (child || child === 0) {
+            el.append(child);
+          }
+        }
+        return el;
+      }
+
+      /** Formats an ISO date as e.g. "Nov 13, 2026". */
+      function formatDate(iso) {
+        return iso
+          ? new Date(iso).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "";
+      }
+
+      /* ---------------- API drawer ---------------- */
+
+      /**
+       * Adds an entry to the API drawer and returns it, so the caller can
+       * fill in the status once the request finishes.
+       */
+      function logCall(method, path) {
+        const key = `${method} ${path.split("?")[0]}`;
+        const upstream = UPSTREAM.find(([pattern]) => pattern.test(key));
+        const status = h(
+          "span",
+          { className: "status" },
+          h("span", { className: "spinner" }),
+        );
+        const item = h(
+          "li",
+          {},
+          h(
+            "div",
+            { className: "call-line" },
+            h("span", { className: "method" }, method),
+            h("span", {}, path.split("?")[0]),
+            status,
+          ),
+          (upstream?.[1] ?? []).map((route) =>
+            h("div", { className: "call-line upstream" }, route),
+          ),
+          upstream && upstream[1].length === 0
+            ? h(
+                "div",
+                { className: "call-note" },
+                "No Scanifly call: the demo server signs a JWT for the user locally.",
+              )
+            : null,
+        );
+        callsList.prepend(item);
+        state.callCount += 1;
+        document.getElementById("call-count").textContent = state.callCount;
+        return {
+          /** Marks the entry as finished with an HTTP status and duration. */
+          done(code, ms) {
+            status.replaceChildren(`${code || "failed"} · ${ms} ms`);
+            status.className = `status ${code > 0 && code < 400 ? "ok" : "fail"}`;
+          },
+          /** Adds a note under the entry, e.g. a postMessage event. */
+          note(kind, text) {
+            item.append(
+              h("div", { className: `call-note event-${kind}` }, text),
+            );
+          },
+        };
+      }
+
+      /** Adds a free-standing note (e.g. an iframe postMessage) to the drawer. */
+      function logEvent(kind, text) {
+        const arrow = { in: "← ", out: "→ " }[kind] || "";
+        callsList.prepend(
+          h(
+            "li",
+            {},
+            h("div", { className: `call-note event-${kind}` }, arrow + text),
+          ),
+        );
+      }
+
+      /**
+       * Calls the demo server and logs it in the drawer. Resolves to the JSON
+       * body, or throws with the server's error message.
+       */
+      async function api(method, path, body) {
+        const entry = logCall(method, path);
+        const started = performance.now();
+        let response;
+        try {
+          response = await fetch(path, {
+            method,
+            headers: body ? { "Content-Type": "application/json" } : {},
+            body: body ? JSON.stringify(body) : undefined,
+          });
+        } catch (err) {
+          entry.done(0, Math.round(performance.now() - started));
+          throw new Error("Could not reach the demo server");
+        }
+        entry.done(response.status, Math.round(performance.now() - started));
+        const text = await response.text();
+        let data;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          data = text;
+        }
+        if (!response.ok) {
+          throw new Error(data?.message || `HTTP ${response.status}`);
+        }
+        return data;
+      }
+
+      /** The current user's identity, as query params or body fields. */
+      function who() {
+        return {
+          email: state.user.email,
+          ...(state.user.scaniflyUserId && {
+            scaniflyUserId: state.user.scaniflyUserId,
+          }),
+        };
+      }
+
+      /* ---------------- sign in ---------------- */
+
+      /** Shows the pretend sign-in dialog, prefilled with the current user. */
+      function openSignIn() {
+        const dialog = document.getElementById("signin-dialog");
+        const form = document.getElementById("signin-form");
+        form.email.value = state.user?.email || "";
+        form.scaniflyUserId.value = state.user?.scaniflyUserId || "";
+        dialog.showModal();
+      }
+
+      /** Stores the signed-in user and re-renders the app as them. */
+      function signIn(user) {
+        state.user = user;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        } catch {}
+        document.getElementById("user-chip").hidden = false;
+        document.getElementById("user-email").textContent = user.email;
+        document.getElementById("user-avatar").textContent = user.email.slice(
+          0,
+          2,
+        );
+        navigate({ name: "projects" });
+      }
+
+      /* ---------------- router ---------------- */
+
+      /** Switches the main view and highlights its nav item. */
+      function navigate(route) {
+        teardownView();
+        teardownView = () => {};
+        state.route = route;
+        for (const item of document.querySelectorAll("[data-nav]")) {
+          const active =
+            item.dataset.nav === route.name ||
+            (item.dataset.nav === "projects" && route.name === "project");
+          item.toggleAttribute("aria-current", active);
+          if (active) item.setAttribute("aria-current", "page");
+        }
+        view.replaceChildren();
+        if (!state.user) {
+          view.append(h("div", { className: "empty" }, "Sign in to continue."));
+          return;
+        }
+        if (route.name === "projects") renderProjects();
+        if (route.name === "project")
+          renderProject(route.project, route.designId);
+        if (route.name === "settings") renderSettings();
+        view.focus({ preventScroll: true });
+      }
+
+      /* ---------------- projects list ---------------- */
+
+      /** Renders the user's projects, newest first. */
+      async function renderProjects() {
+        const body = h(
+          "div",
+          { className: "card" },
+          loadingBlock("Loading projects…"),
+        );
+        view.append(
+          h(
+            "div",
+            { className: "page-head" },
+            h(
+              "div",
+              {},
+              h("h1", {}, "Projects"),
+              h("p", {}, "Every site you've surveyed or designed in Scanifly."),
+            ),
+            h(
+              "button",
+              {
+                className: "btn primary",
+                type: "button",
+                onclick: openNewProject,
+              },
+              "+ New project",
+            ),
+          ),
+          body,
+        );
+
+        try {
+          const params = new URLSearchParams({ ...who(), size: "50" });
+          const result = await api("GET", `/scanifly/projects?${params}`);
+          if (state.route.name !== "projects") return;
+          if (!result.items.length) {
+            body.replaceChildren(
+              h(
+                "div",
+                { className: "empty" },
+                "No projects yet. Create one to see it in 3D.",
+              ),
+            );
+            return;
+          }
+          body.replaceChildren(
+            h(
+              "table",
+              { className: "table" },
+              h(
+                "thead",
+                {},
+                h(
+                  "tr",
+                  {},
+                  h("th", {}, "Customer"),
+                  h("th", { className: "hide-sm" }, "Address"),
+                  h("th", { className: "hide-sm" }, "Status"),
+                  h("th", {}, "Created"),
+                ),
+              ),
+              h(
+                "tbody",
+                {},
+                result.items.map((project) =>
+                  h(
+                    "tr",
+                    {
+                      tabIndex: 0,
+                      onclick: () => navigate({ name: "project", project }),
+                      onkeydown: (e) =>
+                        e.key === "Enter" &&
+                        navigate({ name: "project", project }),
+                    },
+                    h("td", { className: "name" }, project.name),
+                    h("td", { className: "hide-sm muted" }, project.address),
+                    h(
+                      "td",
+                      { className: "hide-sm" },
+                      project.status
+                        ? h("span", { className: "badge" }, project.status)
+                        : "",
+                    ),
+                    h(
+                      "td",
+                      { className: "muted" },
+                      formatDate(project.createdAt),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            result.totalCount > result.items.length
+              ? h(
+                  "div",
+                  { className: "empty" },
+                  `Showing ${result.items.length} of ${result.totalCount}`,
+                )
+              : "",
+          );
+        } catch (err) {
+          body.replaceChildren(errorBlock(err));
+        }
+      }
+
+      /** A centered spinner with a label. */
+      function loadingBlock(label) {
+        return h(
+          "div",
+          { className: "empty" },
+          h("span", { className: "spinner" }),
+          " ",
+          label,
+        );
+      }
+
+      /** A centered error message, with a hint when Scanifly rejected the user's JWT. */
+      function errorBlock(err) {
+        return h(
+          "div",
+          { className: "error-box" },
+          err.message,
+          /unauthorized/i.test(err.message)
+            ? h(
+                "p",
+                { className: "muted" },
+                "Scanifly did not accept the JWT for this user. Check that your JWKS endpoint is reachable over HTTPS and serves the key in JWKS_KEY_ID, and that the user is in a company your reseller is authorized for.",
+              )
+            : null,
+        );
+      }
+
+      /** Opens the New project dialog; on submit creates it (and a design) and opens it. */
+      function openNewProject() {
+        const dialog = document.getElementById("project-dialog");
+        const form = document.getElementById("project-form");
+        const errorEl = document.getElementById("project-error");
+        form.reset();
+        errorEl.textContent = "";
+        dialog.showModal();
+        form.onsubmit = async (event) => {
+          if (event.submitter?.value !== "create") return;
+          event.preventDefault();
+          const submit = event.submitter;
+          submit.disabled = true;
+          errorEl.textContent = "";
+          try {
+            const project = await api("POST", "/scanifly/project", {
+              ...who(),
+              name: form.name.value.trim(),
+              address: form.address.value.trim(),
+            });
+            let designId;
+            if (form.withDesign.checked) {
+              const design = await api("POST", "/scanifly/design", {
+                ...who(),
+                scaniflyProjectId: project.id,
+                name: "Design 1",
+              });
+              designId = design.id;
+            }
+            dialog.close();
+            navigate({ name: "project", project, designId });
+          } catch (err) {
+            errorEl.textContent = err.message;
+          } finally {
+            submit.disabled = false;
+          }
+        };
+      }
+
+      /* ---------------- project detail ---------------- */
+
+      /** Renders one project: its designs on the left, the Scanifly 3D viewer on the right. */
+      async function renderProject(project, selectedDesignId) {
+        const designList = h("div", {}, loadingBlock("Loading…"));
+        const viewer = h(
+          "div",
+          { className: "card viewer" },
+          h(
+            "div",
+            { className: "viewer-head" },
+            h("h2", {}, "3D model"),
+            h("span", { className: "embed-tag" }, "Embedded from Scanifly"),
+          ),
+          h(
+            "div",
+            { className: "viewer-body" },
+            h(
+              "span",
+              { className: "muted" },
+              "Pick a design to open it in 3D.",
+            ),
+          ),
+        );
+
+        view.append(
+          h(
+            "button",
+            {
+              className: "crumb",
+              type: "button",
+              onclick: () => navigate({ name: "projects" }),
+            },
+            "← Projects",
+          ),
+          h(
+            "div",
+            { className: "page-head" },
+            h(
+              "div",
+              {},
+              h("h1", {}, project.name),
+              h("p", {}, project.address),
+            ),
+            h(
+              "button",
+              {
+                className: "btn",
+                type: "button",
+                onclick: () => openNewDesign(project),
+              },
+              "+ New design",
+            ),
+          ),
+          h(
+            "div",
+            { className: "project-layout" },
+            h(
+              "div",
+              { className: "card designs" },
+              h("h2", {}, "Designs"),
+              designList,
+            ),
+            viewer,
+          ),
+        );
+
+        let designs;
+        try {
+          designs = await api(
+            "GET",
+            `/scanifly/projects/${encodeURIComponent(project.id)}/designs?${new URLSearchParams(who())}`,
+          );
+        } catch (err) {
+          designList.replaceChildren(errorBlock(err));
+          return;
+        }
+        if (state.route.project !== project) return;
+
+        if (!designs.length) {
+          designList.replaceChildren(
+            h("div", { className: "empty" }, "No designs yet."),
+          );
+          return;
+        }
+
+        /** Highlights `design` in the list and loads it in the 3D viewer. */
+        const select = (design) => {
+          for (const button of designList.querySelectorAll(".design-item")) {
+            button.setAttribute(
+              "aria-current",
+              String(button.dataset.id === design.id),
+            );
+          }
+          open3d(viewer, project, design);
+        };
+
+        designList.replaceChildren(
+          ...designs.map((design) =>
+            h(
+              "button",
+              {
+                className: "design-item",
+                type: "button",
+                "data-id": design.id,
+                onclick: () => select(design),
+              },
+              design.name,
+              h(
+                "small",
+                {},
+                [
+                  design.systemSize
+                    ? `${design.systemSize.toFixed(2)} kW`
+                    : null,
+                  formatDate(design.updatedAt || design.createdAt),
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+              ),
+            ),
+          ),
+        );
+
+        select(designs.find((d) => d.id === selectedDesignId) || designs[0]);
+      }
+
+      /**
+       * Asks the demo server for a signed 3D viewer URL for the design and
+       * shows it in the viewer card.
+       */
+      async function open3d(viewer, project, design) {
+        const head = viewer.querySelector(".viewer-head");
+        const body = viewer.querySelector(".viewer-body");
+        head.replaceChildren(
+          h("h2", {}, design.name),
+          h("span", { className: "embed-tag" }, "Embedded from Scanifly"),
+        );
+        body.replaceChildren(loadingBlock("Opening the 3D model…"));
+        viewer.classList.remove("embedded");
+        try {
+          const url = await api("POST", "/scanifly/3dUrl", {
+            ...who(),
+            scaniflyProjectId: project.id,
+            scaniflyDesignId: design.id,
+          });
+          if (state.route.project !== project) return;
+          logEvent(
+            "info",
+            `iframe src = ${new URL(url).origin}/?ID=…&did=…&token=… (the 3D viewer reads the JWT from the URL)`,
+          );
+          body.replaceChildren(
+            h("iframe", {
+              src: url,
+              title: `Scanifly 3D: ${design.name}`,
+              allow: "fullscreen; clipboard-write",
+            }),
+          );
+          viewer.classList.add("embedded");
+          if (design.designUrl) {
+            head.append(
+              h(
+                "a",
+                { href: design.designUrl, target: "_blank", rel: "noopener" },
+                "Open in Scanifly ↗",
+              ),
+            );
+          }
+        } catch (err) {
+          body.replaceChildren(errorBlock(err));
+        }
+      }
+
+      /** Opens the New design dialog; on submit creates the design and selects it. */
+      function openNewDesign(project) {
+        const dialog = document.getElementById("design-dialog");
+        const form = document.getElementById("design-form");
+        const errorEl = document.getElementById("design-error");
+        form.reset();
+        errorEl.textContent = "";
+        dialog.showModal();
+        form.onsubmit = async (event) => {
+          if (event.submitter?.value !== "create") return;
+          event.preventDefault();
+          const submit = event.submitter;
+          submit.disabled = true;
+          try {
+            const design = await api("POST", "/scanifly/design", {
+              ...who(),
+              scaniflyProjectId: project.id,
+              name: form.name.value.trim(),
+            });
+            dialog.close();
+            navigate({ name: "project", project, designId: design.id });
+          } catch (err) {
+            errorEl.textContent = err.message;
+          } finally {
+            submit.disabled = false;
+          }
+        };
+      }
+
+      /* ---------------- design settings ---------------- */
+
+      const READY_MESSAGE = "scanifly:embed-ready";
+      const AUTH_MESSAGE = "scanifly:embed-auth";
+      const MAX_TOKENS_PER_MOUNT = 3;
+
+      /**
+       * Mounts the Scanifly design settings embed inside `container` and signs
+       * the user in over postMessage. Same handshake as /demo/design-settings,
+       * which documents each step. Returns a function that unmounts it.
+       */
+      async function mountDesignSettings(container, getSession, onEvent) {
+        let session = await getSession();
+        const embedOrigin = new URL(session.embedUrl).origin;
+        const iframe = h("iframe", { title: "Scanifly design settings" });
+        let tokensSent = 0;
+        let isMinting = false;
+
+        /** Answers the iframe's READY ping with a token, minting a new one if the last was rejected. */
+        async function handleMessage(event) {
+          if (
+            event.source !== iframe.contentWindow ||
+            event.origin !== embedOrigin
+          ) {
+            return;
+          }
+          if (event.data?.type !== READY_MESSAGE || isMinting) {
+            return;
+          }
+          onEvent("in", `${READY_MESSAGE} from ${event.origin}`);
+          if (tokensSent >= MAX_TOKENS_PER_MOUNT) {
+            onEvent(
+              "error",
+              "The embed keeps rejecting this user's token. Giving up.",
+            );
+            window.removeEventListener("message", handleMessage);
+            return;
+          }
+          if (tokensSent > 0) {
+            isMinting = true;
+            try {
+              session = await getSession();
+            } finally {
+              isMinting = false;
+            }
+          }
+          iframe.contentWindow.postMessage(
+            { type: AUTH_MESSAGE, token: session.token },
+            embedOrigin,
+          );
+          tokensSent += 1;
+          onEvent(
+            "out",
+            `${AUTH_MESSAGE} to ${embedOrigin} (token ${tokensSent})`,
+          );
+        }
+
+        window.addEventListener("message", handleMessage);
+        iframe.src = session.embedUrl;
+        container.replaceChildren(iframe);
+        onEvent(
+          "info",
+          `iframe src = ${session.embedUrl} (no token in the URL)`,
+        );
+
+        return () => {
+          window.removeEventListener("message", handleMessage);
+          iframe.remove();
+        };
+      }
+
+      /** Renders the Settings → Design settings page with the Scanifly embed. */
+      async function renderSettings() {
+        const body = h(
+          "div",
+          { className: "viewer-body" },
+          loadingBlock("Opening design settings…"),
+        );
+        const card = h(
+          "div",
+          { className: "card viewer" },
+          h(
+            "div",
+            { className: "viewer-head" },
+            h("h2", {}, "Module library, setbacks and simulation defaults"),
+            h("span", { className: "embed-tag" }, "Embedded from Scanifly"),
+          ),
+          body,
+        );
+        view.append(
+          h(
+            "div",
+            { className: "page-head" },
+            h(
+              "div",
+              {},
+              h("h1", {}, "Design settings"),
+              h(
+                "p",
+                {},
+                "Defaults Scanifly uses for every new design you make.",
+              ),
+            ),
+          ),
+          card,
+        );
+
+        let unmounted = false;
+        let unmount = () => {};
+        teardownView = () => {
+          unmounted = true;
+          unmount();
+        };
+        try {
+          const handle = await mountDesignSettings(
+            body,
+            () => api("POST", "/scanifly/design-settings-embed", who()),
+            logEvent,
+          );
+          if (unmounted) {
+            handle();
+            return;
+          }
+          unmount = handle;
+          card.classList.add("embedded");
+        } catch (err) {
+          body.replaceChildren(errorBlock(err));
+        }
+      }
+
+      /* ---------------- boot ---------------- */
+
+      document.getElementById("drawer-toggle").addEventListener("click", () => {
+        drawer.classList.toggle("open");
+      });
+      document
+        .getElementById("user-chip")
+        .addEventListener("click", openSignIn);
+      for (const item of document.querySelectorAll("[data-nav]")) {
+        item.addEventListener("click", () =>
+          navigate({ name: item.dataset.nav }),
+        );
+      }
+      document
+        .getElementById("signin-form")
+        .addEventListener("submit", (event) => {
+          const form = event.target;
+          signIn({
+            email: form.email.value.trim(),
+            scaniflyUserId: form.scaniflyUserId.value.trim() || undefined,
+          });
+        });
+
+      // ?email=… (and optional &scaniflyUserId=…) skips the sign-in dialog.
+      const params = new URLSearchParams(window.location.search);
+      let savedUser = null;
+      try {
+        savedUser = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      } catch {}
+      const initialUser = params.get("email")
+        ? {
+            email: params.get("email"),
+            scaniflyUserId: params.get("scaniflyUserId") || undefined,
+          }
+        : savedUser;
+      if (initialUser?.email) {
+        signIn(initialUser);
+      } else {
+        navigate({ name: "projects" });
+        openSignIn();
+      }
+      if (params.get("api") === "1") drawer.classList.add("open");
+    </script>
+  </body>
+</html>

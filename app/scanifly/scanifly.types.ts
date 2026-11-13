@@ -18,7 +18,6 @@ type AddCompanyToScaniflyResponse = {
 
 type AddDesignToScaniflyRequest = {
   scaniflyProjectId: string;
-  scaniflyCompanyId: string;
   /**
    * Only required if the email in your system does not match the user's email in Scanifly
    */
@@ -27,18 +26,10 @@ type AddDesignToScaniflyRequest = {
   name: string;
 };
 
-type AddDesignToScaniflyResponse = {
-  projectId: string;
-  companyId: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-};
+type AddDesignToScaniflyResponse = ScaniflyDesign;
 
 type CreateDesignBody = {
   projectId: string;
-  companyId: string;
   name: string;
   remote: boolean;
 };
@@ -51,12 +42,10 @@ type CreateModuleLibraryBody = {
 type CreateProjectBody = {
   name: string;
   address: string;
-  geolocation: {
+  geolocation?: {
     latitude: number;
     longitude: number;
   };
-  createdBy: string;
-  companyId: string;
 };
 
 type AddModuleLibraryToScaniflyRequest = {
@@ -86,36 +75,25 @@ type AddModuleLibraryToScaniflyResponse = {
 type AddProjectToScaniflyRequest = {
   name: string;
   address: string;
-  geolocation: {
+  /**
+   * Optional. When left out, Scanifly geocodes `address`.
+   */
+  geolocation?: {
     latitude: number;
     longitude: number;
   };
   /**
-   * Email of user in your system who owns project
+   * Email of user in your system who owns project.
+   * The project is created in this user's Scanifly company.
    */
   email: string;
   /**
    * Only required if the email in your system does not match the user's email in Scanifly
    */
   scaniflyUserId?: string;
-  scaniflyCompanyId: string;
 };
 
-type AddProjectToScaniflyResponse = {
-  name: string;
-  teammates: string[];
-  address: string;
-  geolocation: {
-    longitude: number;
-    latitude: number;
-  };
-  companyId: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-  createdById: string;
-};
+type AddProjectToScaniflyResponse = ScaniflyProject;
 
 type AddUserToScaniflyRequest = {
   firstName: string;
@@ -147,6 +125,43 @@ type Get3dEmbedRequest = {
    * Only required if the email in your system does not match the user's email in Scanifly
    */
   scaniflyUserId?: string;
+};
+
+type ListDesignsInScaniflyRequest = {
+  scaniflyProjectId: string;
+  /**
+   * Email of user in your system to list the designs as
+   */
+  email: string;
+  /**
+   * Only required if the email in your system does not match the user's email in Scanifly
+   */
+  scaniflyUserId?: string;
+};
+
+type ListProjectsInScaniflyRequest = {
+  /**
+   * Email of user in your system to list the projects as
+   */
+  email: string;
+  /**
+   * Only required if the email in your system does not match the user's email in Scanifly
+   */
+  scaniflyUserId?: string;
+  /**
+   * 1-based page number
+   */
+  pageIndex?: number;
+  /**
+   * Projects per page, at most 150
+   */
+  size?: number;
+};
+
+type ListProjectsInScaniflyResponse = {
+  items: ScaniflyProject[];
+  totalCount: number;
+  pageIndex?: number;
 };
 
 type GetDesignSettingsEmbedRequest = {
@@ -201,6 +216,37 @@ type ResellerType = {
   getJwtVerificationKeyEndpoint: string;
   name: string;
   isActive: boolean;
+};
+
+type ScaniflyCompany = {
+  id: string;
+  name: string;
+};
+
+/**
+ * A design as returned by the Scanifly `/api/v1/designs` routes
+ */
+type ScaniflyDesign = {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  /**
+   * Link to the design in the Scanifly portal
+   */
+  designUrl?: string;
+  /**
+   * kW
+   */
+  systemSize?: number;
+  /**
+   * kWh
+   */
+  annualProduction?: number;
+  /**
+   * Annual production over the project's annual consumption
+   */
+  offset?: number;
 };
 
 type ScaniflyModule = {
@@ -295,6 +341,24 @@ type ScaniflyModule = {
   notes?: string;
 };
 
+/**
+ * A project as returned by the Scanifly `/api/v1/projects` routes
+ */
+type ScaniflyProject = {
+  id: string;
+  companyId: string;
+  name: string;
+  address: string;
+  status?: string;
+  geolocation: {
+    longitude: number;
+    latitude: number;
+  };
+  teammates?: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 type ScaniflyUser = {
   id: string;
   firstName: string;
@@ -334,11 +398,17 @@ export type {
   Get3dEmbedRequest,
   GetDesignSettingsEmbedRequest,
   GetDesignSettingsEmbedResponse,
+  ListDesignsInScaniflyRequest,
+  ListProjectsInScaniflyRequest,
+  ListProjectsInScaniflyResponse,
   PurchaseCreditsBody,
   PurchaseCreditsResponse,
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   ResellerType,
+  ScaniflyCompany,
+  ScaniflyDesign,
+  ScaniflyProject,
   ScaniflyUser,
   UpdateJwksEndpointRequest,
 };

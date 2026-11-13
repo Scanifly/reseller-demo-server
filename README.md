@@ -45,9 +45,29 @@ This server authenticates to Scanifly with an API key instead of an email/passwo
 4. Copy the token when it is displayed and store it somewhere safe — treat it like a password.
 5. Paste it into the `SCANIFLY_API_KEY` field in your `.env`.
 
-The server sends the key in the `x-api-token` header. API keys are only accepted on `/api/v1/*` endpoints, which this server already uses for all admin-level calls. User-scoped calls (e.g. creating designs) continue to use JWTs signed by your JWKS private key and are unaffected.
+The server sends the key in the `x-api-token` header for reseller-level calls (creating companies and users, buying credits, setting your JWKS endpoint). Calls made on behalf of one of your users (creating projects and designs, listing them) instead send a JWT for that user, signed with your JWKS private key, as `Authorization: Bearer <jwt>`.
 
 If a request fails with `401 Unauthorized`, the key may have expired or been revoked — generate a new one from the same Access Tokens page.
+
+### Scanifly API routes used
+
+Every call this server makes goes to a documented route under Scanifly's public `/api/v1` API, with one of two credentials:
+
+| This server | Scanifly route | Auth |
+| --- | --- | --- |
+| (first use, then cached) | `GET /api/v1/companies/current` to look up your reseller company ID | API key |
+| `POST /scanifly/company` | `POST /api/v1/reseller/company` | API key |
+| `POST /scanifly/user` | `POST /api/v1/reseller/user` | API key |
+| `POST /scanifly/credit` | `POST /api/v1/reseller/subscription/credits` | API key |
+| `PATCH /scanifly/reseller` | `PATCH /api/v1/reseller` | API key |
+| `GET /scanifly/projects` | `GET /api/v1/projects` | User JWT |
+| `POST /scanifly/project` | `POST /api/v1/projects` | User JWT |
+| `GET /scanifly/projects/{id}/designs` | `GET /api/v1/designs/{projectId}` | User JWT |
+| `POST /scanifly/design` | `POST /api/v1/designs/{projectId}` | User JWT |
+| `POST /scanifly/module-library` | `POST /api/v1/module-library` (plus `GET /api/v1/companies/current/members` to find the user's ID when you don't pass `scaniflyUserId`) | User JWT |
+| `POST /scanifly/3dUrl`, `POST /scanifly/design-settings-embed` | none: the server signs a user JWT for the embed | — |
+
+A user JWT acts as that user, so projects and designs land in the user's own Scanifly company. You don't pass a company ID for them.
 
 ### Running Locally
 
@@ -106,6 +126,20 @@ If the user already has a companyId and userId you can skip to step 3.
 3. Create a project in Scanifly for a given address
 4. Create a design in Scanifly to associate with the project
 5. Get a 3D URL
+
+### See the embeds in a mock partner app
+
+With this server running, open [`http://localhost:3001/demo`](http://localhost:3001/demo). It is **Acme Solar CRM**, a made-up partner product with Scanifly built in, so you can see what your users would see:
+
+- **Sign in** with the email of a user in a company your reseller is authorized for. Add `?email=designer@customer.com` to the URL to skip that step.
+- **Projects** lists the user's Scanifly projects. **New project** creates one from an address (Scanifly geocodes it) and, by default, a first design.
+- **Open a project** to see its designs, and the selected design in the Scanifly 3D viewer.
+- **Settings → Design settings** shows the design settings embed, signed in over `postMessage` (see below).
+- **API calls** (top right) lists each request the page made to this server and the Scanifly `/api/v1` route behind it, plus the embed's `postMessage` events. Add `&api=1` to the URL to open it on load.
+
+The page is plain HTML and JavaScript in [`app/public/partner-app.html`](./app/public/partner-app.html). It passes the user's email to this server from the browser to keep the demo simple. In your product, take the user from your own session on the server.
+
+`SCANIFLY_ENDPOINT`, `SCANIFLY_3D_URL` and `SCANIFLY_PORTAL_URL` must all point at the same Scanifly environment, or the embeds can't find the projects and users the API returns.
 
 ### Embedding the 3D Design Settings
 
