@@ -121,10 +121,26 @@
 				],
 				"type": "object"
 			},
-			"AddDesignToScaniflyResponse": {
+			"ScaniflyDesign": {
 				"properties": {
-					"id": {
-						"type": "string"
+					"offset": {
+						"type": "number",
+						"format": "double",
+						"description": "Annual production over the project's annual consumption"
+					},
+					"annualProduction": {
+						"type": "number",
+						"format": "double",
+						"description": "kWh"
+					},
+					"systemSize": {
+						"type": "number",
+						"format": "double",
+						"description": "kW"
+					},
+					"designUrl": {
+						"type": "string",
+						"description": "Link to the design in the Scanifly portal"
 					},
 					"updatedAt": {
 						"type": "string"
@@ -135,22 +151,21 @@
 					"name": {
 						"type": "string"
 					},
-					"companyId": {
-						"type": "string"
-					},
-					"projectId": {
+					"id": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"id",
 					"updatedAt",
 					"createdAt",
 					"name",
-					"companyId",
-					"projectId"
+					"id"
 				],
-				"type": "object"
+				"type": "object",
+				"description": "A design as returned by the Scanifly `/api/v1/designs` routes"
+			},
+			"AddDesignToScaniflyResponse": {
+				"$ref": "#/components/schemas/ScaniflyDesign"
 			},
 			"AddDesignToScaniflyRequest": {
 				"properties": {
@@ -164,9 +179,6 @@
 						"type": "string",
 						"description": "Only required if the email in your system does not match the user's email in Scanifly"
 					},
-					"scaniflyCompanyId": {
-						"type": "string"
-					},
 					"scaniflyProjectId": {
 						"type": "string"
 					}
@@ -174,7 +186,6 @@
 				"required": [
 					"name",
 					"email",
-					"scaniflyCompanyId",
 					"scaniflyProjectId"
 				],
 				"type": "object"
@@ -358,25 +369,19 @@
 				],
 				"type": "object"
 			},
-			"AddProjectToScaniflyResponse": {
+			"ScaniflyProject": {
 				"properties": {
-					"createdById": {
-						"type": "string"
-					},
-					"id": {
-						"type": "string"
-					},
 					"updatedAt": {
 						"type": "string"
 					},
 					"createdAt": {
 						"type": "string"
 					},
-					"createdBy": {
-						"type": "string"
-					},
-					"companyId": {
-						"type": "string"
+					"teammates": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
 					},
 					"geolocation": {
 						"properties": {
@@ -395,45 +400,46 @@
 						],
 						"type": "object"
 					},
+					"status": {
+						"type": "string"
+					},
 					"address": {
 						"type": "string"
 					},
-					"teammates": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
 					"name": {
+						"type": "string"
+					},
+					"companyId": {
+						"type": "string"
+					},
+					"id": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"createdById",
-					"id",
 					"updatedAt",
 					"createdAt",
-					"createdBy",
-					"companyId",
 					"geolocation",
 					"address",
-					"teammates",
-					"name"
+					"name",
+					"companyId",
+					"id"
 				],
-				"type": "object"
+				"type": "object",
+				"description": "A project as returned by the Scanifly `/api/v1/projects` routes"
+			},
+			"AddProjectToScaniflyResponse": {
+				"$ref": "#/components/schemas/ScaniflyProject"
 			},
 			"AddProjectToScaniflyRequest": {
 				"properties": {
-					"scaniflyCompanyId": {
-						"type": "string"
-					},
 					"scaniflyUserId": {
 						"type": "string",
 						"description": "Only required if the email in your system does not match the user's email in Scanifly"
 					},
 					"email": {
 						"type": "string",
-						"description": "Email of user in your system who owns project"
+						"description": "Email of user in your system who owns project.\nThe project is created in this user's Scanifly company."
 					},
 					"geolocation": {
 						"properties": {
@@ -450,7 +456,8 @@
 							"longitude",
 							"latitude"
 						],
-						"type": "object"
+						"type": "object",
+						"description": "Optional. When left out, Scanifly geocodes `address`."
 					},
 					"address": {
 						"type": "string"
@@ -460,11 +467,32 @@
 					}
 				},
 				"required": [
-					"scaniflyCompanyId",
 					"email",
-					"geolocation",
 					"address",
 					"name"
+				],
+				"type": "object"
+			},
+			"ListProjectsInScaniflyResponse": {
+				"properties": {
+					"pageIndex": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/ScaniflyProject"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalCount",
+					"items"
 				],
 				"type": "object"
 			},
@@ -935,6 +963,157 @@
 						}
 					}
 				}
+			}
+		},
+		"/scanifly/projects": {
+			"get": {
+				"operationId": "ListProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ListProjectsInScaniflyResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "List the projects a user can see in their Scanifly company, newest first.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "Email of the user in your system to list the projects as",
+						"in": "query",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Only required if the email in your system does not match the user's email in Scanifly",
+						"in": "query",
+						"name": "scaniflyUserId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "1-based page number",
+						"in": "query",
+						"name": "pageIndex",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "Projects per page, at most 150",
+						"in": "query",
+						"name": "size",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/scanifly/projects/{scaniflyProjectId}/designs": {
+			"get": {
+				"operationId": "ListDesigns",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ScaniflyDesign"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "List the designs on a project, as the given user.",
+				"tags": [
+					"Scanifly"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "scaniflyProjectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Email of the user in your system to list the designs as",
+						"in": "query",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Only required if the email in your system does not match the user's email in Scanifly",
+						"in": "query",
+						"name": "scaniflyUserId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/scanifly/credit": {

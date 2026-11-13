@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Patch,
+  Path,
   Post,
+  Query,
   Res,
   Route,
   SuccessResponse,
@@ -23,9 +26,11 @@ import {
   Get3dEmbedRequest,
   GetDesignSettingsEmbedRequest,
   GetDesignSettingsEmbedResponse,
+  ListProjectsInScaniflyResponse,
   PurchaseCreditsInScaniflyRequest,
   PurchaseCreditsInScaniflyResponse,
   ResellerType,
+  ScaniflyDesign,
   UpdateJwksEndpointRequest,
 } from "./scanifly.types";
 import ScaniflyService from "./scanifly.service";
@@ -150,6 +155,58 @@ class ScaniflyController extends Controller {
     try {
       const result = await this.#scaniflyService.addProject(requestBody);
       return result;
+    } catch (err: any) {
+      console.error(err);
+      return validationErrorResponse(400, { message: err.message });
+    }
+  }
+
+  /**
+   * List the projects a user can see in their Scanifly company, newest first.
+   * @param email Email of the user in your system to list the projects as
+   * @param scaniflyUserId Only required if the email in your system does not match the user's email in Scanifly
+   * @param pageIndex 1-based page number
+   * @param size Projects per page, at most 150
+   */
+  @Get("/projects")
+  public async listProjects(
+    @Query() email: string,
+    @Res() validationErrorResponse: TsoaResponse<400, { message: string }>,
+    @Query() scaniflyUserId?: string,
+    @Query() pageIndex?: number,
+    @Query() size?: number,
+  ): Promise<ListProjectsInScaniflyResponse> {
+    try {
+      return await this.#scaniflyService.listProjects({
+        email,
+        scaniflyUserId,
+        pageIndex,
+        size,
+      });
+    } catch (err: any) {
+      console.error(err);
+      return validationErrorResponse(400, { message: err.message });
+    }
+  }
+
+  /**
+   * List the designs on a project, as the given user.
+   * @param email Email of the user in your system to list the designs as
+   * @param scaniflyUserId Only required if the email in your system does not match the user's email in Scanifly
+   */
+  @Get("/projects/{scaniflyProjectId}/designs")
+  public async listDesigns(
+    @Path() scaniflyProjectId: string,
+    @Query() email: string,
+    @Res() validationErrorResponse: TsoaResponse<400, { message: string }>,
+    @Query() scaniflyUserId?: string,
+  ): Promise<ScaniflyDesign[]> {
+    try {
+      return await this.#scaniflyService.listDesigns({
+        email,
+        scaniflyUserId,
+        scaniflyProjectId,
+      });
     } catch (err: any) {
       console.error(err);
       return validationErrorResponse(400, { message: err.message });

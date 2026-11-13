@@ -35,6 +35,13 @@ class Server {
         res.sendFile("jwks.json", { root: __dirname });
       });
 
+      // Mock partner app (Acme Solar CRM) with the Scanifly embeds in use
+      app.get("/demo", (_: Request, res: Response) => {
+        res.sendFile("partner-app.html", {
+          root: path.resolve(__dirname, "public"),
+        });
+      });
+
       // Demo partner page embedding the Scanifly 3D design settings
       app.get("/demo/design-settings", (_: Request, res: Response) => {
         res.sendFile("design-settings.html", {

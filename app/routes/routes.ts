@@ -37,14 +37,19 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true},"address":{"dataType":"nestedObjectLiteral","nestedProperties":{"country":{"dataType":"string","required":true},"zip":{"dataType":"string","required":true},"state":{"dataType":"string","required":true},"city":{"dataType":"string","required":true},"line":{"dataType":"string","required":true}},"required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ScaniflyDesign": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"offset":{"dataType":"double"},"annualProduction":{"dataType":"double"},"systemSize":{"dataType":"double"},"designUrl":{"dataType":"string"},"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddDesignToScaniflyResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"string","required":true},"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"companyId":{"dataType":"string","required":true},"projectId":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"ref":"ScaniflyDesign","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddDesignToScaniflyRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyUserId":{"dataType":"string"},"scaniflyCompanyId":{"dataType":"string","required":true},"scaniflyProjectId":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"scaniflyUserId":{"dataType":"string"},"scaniflyProjectId":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ScaniflyModule": {
@@ -62,14 +67,24 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"email":{"dataType":"string","required":true},"modules":{"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"ref":"ScaniflyModule"},"required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ScaniflyProject": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"teammates":{"dataType":"array","array":{"dataType":"string"}},"geolocation":{"dataType":"nestedObjectLiteral","nestedProperties":{"latitude":{"dataType":"double","required":true},"longitude":{"dataType":"double","required":true}},"required":true},"status":{"dataType":"string"},"address":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"companyId":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddProjectToScaniflyResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"createdById":{"dataType":"string","required":true},"id":{"dataType":"string","required":true},"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"createdBy":{"dataType":"string","required":true},"companyId":{"dataType":"string","required":true},"geolocation":{"dataType":"nestedObjectLiteral","nestedProperties":{"latitude":{"dataType":"double","required":true},"longitude":{"dataType":"double","required":true}},"required":true},"address":{"dataType":"string","required":true},"teammates":{"dataType":"array","array":{"dataType":"string"},"required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"ref":"ScaniflyProject","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddProjectToScaniflyRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyCompanyId":{"dataType":"string","required":true},"scaniflyUserId":{"dataType":"string"},"email":{"dataType":"string","required":true},"geolocation":{"dataType":"nestedObjectLiteral","nestedProperties":{"longitude":{"dataType":"double","required":true},"latitude":{"dataType":"double","required":true}},"required":true},"address":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scaniflyUserId":{"dataType":"string"},"email":{"dataType":"string","required":true},"geolocation":{"dataType":"nestedObjectLiteral","nestedProperties":{"longitude":{"dataType":"double","required":true},"latitude":{"dataType":"double","required":true}}},"address":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ListProjectsInScaniflyResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"pageIndex":{"dataType":"double"},"totalCount":{"dataType":"double","required":true},"items":{"dataType":"array","array":{"dataType":"refAlias","ref":"ScaniflyProject"},"required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PurchaseCreditsInScaniflyResponse": {
@@ -309,6 +324,73 @@ export function RegisterRoutes(app: Router) {
                 next,
                 validatedArgs,
                 successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsScaniflyController_listProjects: Record<string, TsoaRoute.ParameterSchema> = {
+                email: {"in":"query","name":"email","required":true,"dataType":"string"},
+                validationErrorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+                scaniflyUserId: {"in":"query","name":"scaniflyUserId","dataType":"string"},
+                pageIndex: {"in":"query","name":"pageIndex","dataType":"double"},
+                size: {"in":"query","name":"size","dataType":"double"},
+        };
+        app.get('/scanifly/projects',
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController)),
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController.prototype.listProjects)),
+
+            async function ScaniflyController_listProjects(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsScaniflyController_listProjects, request, response });
+
+                const controller = new ScaniflyController();
+
+              await templateService.apiHandler({
+                methodName: 'listProjects',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsScaniflyController_listDesigns: Record<string, TsoaRoute.ParameterSchema> = {
+                scaniflyProjectId: {"in":"path","name":"scaniflyProjectId","required":true,"dataType":"string"},
+                email: {"in":"query","name":"email","required":true,"dataType":"string"},
+                validationErrorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+                scaniflyUserId: {"in":"query","name":"scaniflyUserId","dataType":"string"},
+        };
+        app.get('/scanifly/projects/:scaniflyProjectId/designs',
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController)),
+            ...(fetchMiddlewares<RequestHandler>(ScaniflyController.prototype.listDesigns)),
+
+            async function ScaniflyController_listDesigns(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsScaniflyController_listDesigns, request, response });
+
+                const controller = new ScaniflyController();
+
+              await templateService.apiHandler({
+                methodName: 'listDesigns',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
